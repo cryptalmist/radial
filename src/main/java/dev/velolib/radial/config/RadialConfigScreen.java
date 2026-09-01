@@ -5,8 +5,12 @@ import dev.isxander.yacl3.api.controller.*;
 import dev.isxander.yacl3.api.utils.Dimension;
 import dev.isxander.yacl3.gui.AbstractWidget;
 import dev.isxander.yacl3.gui.YACLScreen;
+import dev.velolib.radial.api.RadialSlot;
+import dev.velolib.radial.mode.SubmenuSlotMode;
 import dev.velolib.radial.render.DonutRenderer;
+
 import java.awt.*;
+import java.util.List;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.Screen;
@@ -47,6 +51,14 @@ public class RadialConfigScreen {
                                         Component.translatable("screen.radial.config.show_preview.tooltip")))
                                 .binding(true, () -> showPreview, v -> showPreview = v)
                                 .controller(BooleanControllerBuilder::create)
+                                .build())
+                        .option(ButtonOption.createBuilder()
+                                .name(Component.translatable("screen.radial.config.optimize"))
+                                .description(OptionDescription.of(Component.translatable("screen.radial.config.optimize.tooltip")))
+                                .action((_, _) -> {
+                                    optimizeSlotTree(config.slots);
+                                    RadialConfig.save();
+                                })
                                 .build())
                         .option(Option.<Boolean>createBuilder()
                                 .name(Component.empty())
@@ -295,6 +307,21 @@ public class RadialConfigScreen {
                 .save(RadialConfig::save)
                 .build()
                 .generateScreen(parent);
+    }
+
+    private static void optimizeSlotTree(List<RadialSlot> slots) {
+        if (slots == null || slots.isEmpty()) return;
+
+        for (RadialSlot slot : slots) {
+            if (!(slot.mode instanceof SubmenuSlotMode)) {
+                if (slot.children != null) {
+                    slot.children.clear();
+                }
+                slot.childSlotCount = 0;
+            } else {
+                optimizeSlotTree(slot.children);
+            }
+        }
     }
 
     private static Controller<Boolean> createPreviewController(Option<Boolean> opt, RadialConfig config) {

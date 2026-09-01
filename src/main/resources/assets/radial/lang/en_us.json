@@ -133,6 +133,6 @@
   "screen.radial.config.reveal_animation.staggered_counterclockwise": "Staggered — Counterclockwise",
   "screen.radial.config.reveal_animation.staggered_both": "Staggered — Both Directions",
 
-  "screen.radial.config.reset_cursor_on_submenu": "Reset Cursor on Submenu",
-  "screen.radial.config.reset_cursor_on_submenu.tooltip": "Automatically centers the mouse cursor on the screen when opening or closing a submenu, preventing accidental selections in the new menu."
+  "screen.radial.config.optimize": "Optimize Radial Config",
+  "screen.radial.config.optimize.tooltip": "When you change a 'Submenu' slot to another mode, its nested slots are kept saved in the background.\n\nThis button permanently deletes all of that hidden, unused submenu data to optimize memory and shrink your config file size.\n\nWARNING: This action is irreversible. This is the only way to completely reset and clear submenu data for a slot."
 }

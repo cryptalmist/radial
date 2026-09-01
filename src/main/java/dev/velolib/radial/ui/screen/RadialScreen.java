@@ -10,6 +10,8 @@ import dev.velolib.radial.render.SlotRenderHelper;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
+import java.util.Stack;
+
 import net.fabricmc.fabric.api.client.keymapping.v1.KeyMappingHelper;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
@@ -41,6 +43,9 @@ public class RadialScreen extends Screen {
     private static final int MAX_RENDER_SLOTS = 13;
 
     private static final DonutRenderer SECTOR_RENDERER = new DonutRenderer("main");
+
+    private record MenuState(List<RadialSlot> slots, int slotCount) {}
+    private final Stack<MenuState> history = new Stack<>();
 
     private final List<RadialSlot> rootSlots;
     private final float[] pushAnim;
@@ -97,7 +102,7 @@ public class RadialScreen extends Screen {
     // --- State Helpers ---
 
     private boolean isSubmenu() {
-        return activeSlots != rootSlots;
+        return !history.isEmpty();
     }
 
     private int getRenderCount() {
@@ -376,14 +381,19 @@ public class RadialScreen extends Screen {
 
             @Override
             public void openSubmenu(List<RadialSlot> children, int slotCount) {
-                if (activeSlots == rootSlots) {
-                    activeSlots = children;
-                    currentSlotCount = slotCount;
-                    resetAnims();
-                    prepareSectorRenderer();
-                    if (RadialConfig.INSTANCE.resetCursorOnSubmenu) {
-                        resetCursorPosition();
-                    }
+                // Hard limit the submenu depth
+                if (history.size() >= 5) {
+                    return;
+                }
+
+                history.push(new MenuState(activeSlots, currentSlotCount));
+
+                activeSlots = children;
+                currentSlotCount = slotCount;
+                resetAnims();
+                prepareSectorRenderer();
+                if (RadialConfig.INSTANCE.resetCursorOnSubmenu) {
+                    resetCursorPosition();
                 }
             }
 
@@ -395,8 +405,16 @@ public class RadialScreen extends Screen {
     }
 
     private void goBack() {
-        activeSlots = rootSlots;
-        currentSlotCount = RadialConfig.INSTANCE.slotCount;
+        if (!history.isEmpty()) {
+            MenuState previous = history.pop();
+            activeSlots = previous.slots;
+            currentSlotCount = previous.slotCount;
+        } else {
+            // Fallback just in case, though it shouldn't be reached if the back button is hidden on root
+            activeSlots = rootSlots;
+            currentSlotCount = RadialConfig.INSTANCE.slotCount;
+        }
+
         resetAnims();
         prepareSectorRenderer();
         if (RadialConfig.INSTANCE.resetCursorOnSubmenu) {
@@ -452,7 +470,7 @@ public class RadialScreen extends Screen {
 
                 RadialSlot slot = getTargetSlot(hoveredSlot);
                 if (slot != null) {
-                    minecraft.gui.setScreen(new SlotEditorScreen(slot, activeSlots == rootSlots));
+                    minecraft.gui.setScreen(new SlotEditorScreen(slot));
                     return true;
                 }
             }

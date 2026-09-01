@@ -25,9 +25,7 @@ public class SubmenuSlotMode extends IconEnabledSlotMode {
 
     @Override
     public void performAction(RadialSlot slot, SlotActionContext context) {
-        if (context.isRoot()) {
-            context.openSubmenu(slot.children, slot.childSlotCount);
-        }
+        context.openSubmenu(slot.children, slot.childSlotCount);
     }
 
     @Override

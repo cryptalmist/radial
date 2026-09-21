@@ -13,7 +13,7 @@ base {
 
 java.toolchain.languageVersion = JavaLanguageVersion.of(21)
 
-neoforge {
+neoForge {
     version = project.neoforge_version
 
     runs {

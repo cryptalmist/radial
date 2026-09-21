@@ -5,10 +5,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 
@@ -59,7 +59,7 @@ public class ItemIconTab extends GridIconTab<ItemIconTab.ItemSearchEntry> {
 
     @Override
     protected void renderIcon(
-            GuiGraphicsExtractor graphics,
+            GuiGraphics graphics,
             int x,
             int y,
             int mouseX,
@@ -67,10 +67,10 @@ public class ItemIconTab extends GridIconTab<ItemIconTab.ItemSearchEntry> {
             ItemSearchEntry item,
             boolean hovered) {
 
-        graphics.fakeItem(item.stack(), x + 2, y + 2);
+        graphics.renderFakeItem(item.stack(), x + 2, y + 2);
 
         if (hovered) {
-            graphics.setTooltipForNextFrame(Minecraft.getInstance().font, item.stack(), mouseX, mouseY);
+            graphics.renderTooltip(Minecraft.getInstance().font, item.stack(), mouseX, mouseY);
         }
     }
 
@@ -88,10 +88,10 @@ public class ItemIconTab extends GridIconTab<ItemIconTab.ItemSearchEntry> {
     private static void ensureItemIndex() {
         if (ITEM_INDEX != null) return;
 
-        List<ItemSearchEntry> index = new ArrayList<>(BuiltInRegistries.ITEM.size());
+        List<ItemSearchEntry> index = new ArrayList<>();
 
         for (Item item : BuiltInRegistries.ITEM) {
-            Identifier id = BuiltInRegistries.ITEM.getKey(item);
+            ResourceLocation id = BuiltInRegistries.ITEM.getKey(item);
             ItemStack stack = item.getDefaultInstance();
             String name = stack.getItemName().getString();
 
@@ -101,5 +101,5 @@ public class ItemIconTab extends GridIconTab<ItemIconTab.ItemSearchEntry> {
         ITEM_INDEX = List.copyOf(index);
     }
 
-    public record ItemSearchEntry(Item item, ItemStack stack, Identifier id, String displayName, String searchText) {}
+    public record ItemSearchEntry(Item item, ItemStack stack, ResourceLocation id, String displayName, String searchText) {}
 }

@@ -6,13 +6,13 @@ import dev.velolib.radial.integration.MalilibIntegration;
 import dev.velolib.radial.mode.base.IconEnabledSlotMode;
 import dev.velolib.radial.ui.screen.MalilibSelectionScreen;
 import dev.velolib.radial.ui.screen.SlotEditorScreen;
-import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.components.StringWidget;
 import net.minecraft.client.gui.layouts.LinearLayout;
 import net.minecraft.network.chat.Component;
+import net.neoforged.fml.ModList;
 
 public class MalilibSlotMode extends IconEnabledSlotMode {
     @Override
@@ -22,14 +22,14 @@ public class MalilibSlotMode extends IconEnabledSlotMode {
 
     @Override
     public boolean isAvailable() {
-        return FabricLoader.getInstance().isModLoaded("malilib");
+        return ModList.get().isLoaded("mafglib");
     }
 
     @Override
     public void performAction(RadialSlot slot, SlotActionContext context) {
         context.closeScreen();
 
-        if (FabricLoader.getInstance().isModLoaded("malilib")) {
+        if (ModList.get().isLoaded("mafglib")) {
             MalilibIntegration.executeHotkey(slot.value);
         }
     }
@@ -63,7 +63,7 @@ public class MalilibSlotMode extends IconEnabledSlotMode {
 
         Button valueBrowseButton = Button.builder(
                         Component.translatable("screen.radial.editor.select"),
-                        _ -> Minecraft.getInstance().gui.setScreen(new MalilibSelectionScreen(screen, action -> {
+                        _ -> Minecraft.getInstance().setScreen(new MalilibSelectionScreen(screen, action -> {
                             valueField.setValue(action.id());
                             slot.value = action.id();
                         })))

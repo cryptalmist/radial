@@ -13,7 +13,7 @@ import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.components.StringWidget;
 import net.minecraft.client.gui.layouts.LinearLayout;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 
 public class ShortcutSlotMode extends IconEnabledSlotMode {
 
@@ -28,7 +28,7 @@ public class ShortcutSlotMode extends IconEnabledSlotMode {
             return;
         }
 
-        Identifier menuId = Identifier.tryParse(slot.value);
+        ResourceLocation menuId = ResourceLocation.tryParse(slot.value);
         if (menuId == null) {
             return;
         }
@@ -69,8 +69,7 @@ public class ShortcutSlotMode extends IconEnabledSlotMode {
 
         Button valueBrowseButton = Button.builder(
                         Component.translatable("screen.radial.editor.select"), _ -> Minecraft.getInstance()
-                                .gui
-                                .setScreen(new ShortcutSelectionScreen(screen, (Identifier selectedId) -> {
+                                .setScreen(new ShortcutSelectionScreen(screen, (ResourceLocation selectedId) -> {
                                     String idString = selectedId.toString();
                                     valueField.setValue(idString);
                                     slot.value = idString;

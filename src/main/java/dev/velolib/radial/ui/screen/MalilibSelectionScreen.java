@@ -9,12 +9,11 @@ import java.util.TreeMap;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.AbstractSelectionList;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.EditBox;
-import net.minecraft.client.gui.components.ObjectSelectionList;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.Component;
 import org.jspecify.annotations.NonNull;
 
@@ -122,7 +121,8 @@ public class MalilibSelectionScreen extends Screen {
         malilibList =
                 new MalilibList(Minecraft.getInstance(), listWidth, getListHeight(), getListStartY(), ENTRY_HEIGHT);
 
-        malilibList.updateSizeAndPosition(listWidth, getListHeight(), getListLeft(), getListStartY());
+        malilibList.updateSizeAndPosition(listWidth, getListHeight(), getListStartY());
+        malilibList.setX(getListLeft());
 
         addRenderableWidget(malilibList);
 
@@ -171,28 +171,28 @@ public class MalilibSelectionScreen extends Screen {
     }
 
     @Override
-    public void extractRenderState(@NonNull GuiGraphicsExtractor graphics, int mouseX, int mouseY, float delta) {
+    public void render(GuiGraphics graphics, int mouseX, int mouseY, float delta) {
 
         graphics.fillGradient(0, 0, width, height, 0xC0101010, 0xD0101010);
 
         if (actionsByMod.isEmpty()) {
-            graphics.centeredText(
+            graphics.drawCenteredString(
                     font, "No Malilib mods found or no hotkeys available.", width / 2, height / 2, 0xFF555555);
 
-            super.extractRenderState(graphics, mouseX, mouseY, delta);
+            super.render(graphics, mouseX, mouseY, delta);
 
             return;
         }
 
-        super.extractRenderState(graphics, mouseX, mouseY, delta);
+        super.render(graphics, mouseX, mouseY, delta);
     }
 
     @Override
     public void onClose() {
-        minecraft.gui.setScreen(parent);
+        minecraft.setScreen(parent);
     }
 
-    private static class MalilibList extends ObjectSelectionList<MalilibEntry> {
+    private static class MalilibList extends AbstractSelectionList<MalilibEntry> {
 
         private MalilibList(Minecraft minecraft, int width, int height, int y, int itemHeight) {
 
@@ -205,7 +205,7 @@ public class MalilibSelectionScreen extends Screen {
         }
     }
 
-    private static class MalilibEntry extends ObjectSelectionList.Entry<MalilibEntry> {
+    private static class MalilibEntry extends AbstractSelectionList.Entry<MalilibEntry> {
 
         private final MalilibAction action;
         private final Consumer<MalilibAction> onSelect;
@@ -219,33 +219,40 @@ public class MalilibSelectionScreen extends Screen {
         }
 
         @Override
-        public void extractContent(
-                GuiGraphicsExtractor graphics, int mouseX, int mouseY, boolean hovered, float delta) {
+        public void render(
+                GuiGraphics graphics,
+                int index,
+                int top,
+                int left,
+                int width,
+                int height,
+                int mouseX,
+                int mouseY,
+                boolean hovered,
+                float delta) {
 
             Minecraft client = Minecraft.getInstance();
 
-            int left = getContentX();
-            int top = getContentY();
-            int right = getContentRight();
-            int bottom = getContentBottom();
+            int right = left + width;
+            int bottom = top + height;
 
             graphics.fill(left, top + 1, right, bottom - 1, hovered ? 0x80FFFFFF : 0x40000000);
 
             int textY = top + ((bottom - top) - client.font.lineHeight) / 2;
 
-            graphics.text(client.font, action.displayName(), left + 8, textY, 0xFFFFFFFF);
+            graphics.drawString(client.font, action.displayName(), left + 8, textY, 0xFFFFFFFF);
 
             String category = action.category();
 
             int categoryWidth = client.font.width(category);
 
-            graphics.text(client.font, category, right - categoryWidth - 8, textY, 0xFFAAAAAA);
+            graphics.drawString(client.font, category, right - categoryWidth - 8, textY, 0xFFAAAAAA);
         }
 
         @Override
-        public boolean mouseClicked(MouseButtonEvent event, boolean doubleClick) {
+        public boolean mouseClicked(double mouseX, double mouseY, int button) {
 
-            if (event.button() != 0) {
+            if (button != 0) {
                 return false;
             }
 

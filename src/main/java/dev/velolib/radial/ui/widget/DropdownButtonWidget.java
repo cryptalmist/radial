@@ -5,19 +5,17 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
-import net.minecraft.client.input.MouseButtonEvent;
-import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import org.jspecify.annotations.NonNull;
 
 public class DropdownButtonWidget<T> extends AbstractWidget {
-    private static final Identifier SPRITE = Identifier.fromNamespaceAndPath("minecraft", "widget/text_field");
-    private static final Identifier SPRITE_HIGHLIGHTED =
-            Identifier.fromNamespaceAndPath("minecraft", "widget/text_field_highlighted");
+    private static final ResourceLocation SPRITE = ResourceLocation.fromNamespaceAndPath("minecraft", "widget/text_field");
+    private static final ResourceLocation SPRITE_HIGHLIGHTED =
+            ResourceLocation.fromNamespaceAndPath("minecraft", "widget/text_field_highlighted");
     private final List<T> options;
     private final Function<T, Component> labelMapper;
     private final Consumer<T> onSelect;
@@ -63,16 +61,16 @@ public class DropdownButtonWidget<T> extends AbstractWidget {
     }
 
     @Override
-    public boolean mouseClicked(final @NonNull MouseButtonEvent event, final boolean doubleClick) {
-        if (this.isActive() && this.isMouseOver(event.x(), event.y())) {
-            this.onClick(event, doubleClick);
+    public boolean mouseClicked(double mouseX, double mouseY, int button) {
+        if (this.isActive() && this.isMouseOver(mouseX, mouseY)) {
+            this.onClick(mouseX, mouseY);
             return true;
         }
-        return super.mouseClicked(event, doubleClick);
+        return super.mouseClicked(mouseX, mouseY, button);
     }
 
     @Override
-    public void onClick(final @NonNull MouseButtonEvent event, final boolean doubleClick) {
+    public void onClick(double mouseX, double mouseY) {
         // PLAY SOUND: Triggers the standard click noise when toggling the menu
         this.playDownSound(Minecraft.getInstance().getSoundManager());
 
@@ -93,20 +91,20 @@ public class DropdownButtonWidget<T> extends AbstractWidget {
     }
 
     @Override
-    protected void extractWidgetRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float delta) {
+    protected void renderWidget(GuiGraphics graphics, int mouseX, int mouseY, float delta) {
         Minecraft mc = Minecraft.getInstance();
         Font font = mc.font;
 
         boolean open = isMenuOpen();
-        Identifier currentSprite = (this.isFocused() || open) ? SPRITE_HIGHLIGHTED : SPRITE;
+        ResourceLocation currentSprite = (this.isFocused() || open) ? SPRITE_HIGHLIGHTED : SPRITE;
 
-        graphics.blitSprite(RenderPipelines.GUI_TEXTURED, currentSprite, getX(), getY(), width, height);
+        graphics.blitSprite(currentSprite, getX(), getY(), width, height);
 
         int textColor = this.active ? 0xFFFFFFFF : 0xFFA0A0A0;
         Component currentText = this.labelMapper.apply(this.selectedOption);
 
-        graphics.text(font, currentText, getX() + 4, getY() + (getHeight() - 8) / 2, textColor);
-        graphics.text(
+        graphics.drawString(font, currentText, getX() + 4, getY() + (getHeight() - 8) / 2, textColor);
+        graphics.drawString(
                 font,
                 Component.literal(open ? "▲" : "▼"),
                 getX() + width - 12,

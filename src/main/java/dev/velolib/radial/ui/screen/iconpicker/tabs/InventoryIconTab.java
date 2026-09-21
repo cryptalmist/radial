@@ -3,20 +3,19 @@ package dev.velolib.radial.ui.screen.iconpicker.tabs;
 import dev.velolib.radial.ui.screen.iconpicker.IconTab;
 import java.util.function.Consumer;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Renderable;
 import net.minecraft.client.gui.components.events.GuiEventListener;
-import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.ItemStack;
 
 public class InventoryIconTab implements IconTab {
 
-    private static final Identifier INVENTORY_TEXTURE =
-            Identifier.fromNamespaceAndPath("minecraft", "textures/gui/container/inventory.png");
+    private static final ResourceLocation INVENTORY_TEXTURE =
+            ResourceLocation.fromNamespaceAndPath("minecraft", "textures/gui/container/inventory.png");
     private static final int INV_WIDTH = 176;
     private static final int INV_HEIGHT = 166;
     private static final int INV_SLOT_SIZE = 18;
@@ -50,7 +49,7 @@ public class InventoryIconTab implements IconTab {
     }
 
     @Override
-    public void render(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float delta) {
+    public void render(GuiGraphics graphics, int mouseX, int mouseY, float delta) {
         Minecraft mc = Minecraft.getInstance();
         if (mc.player == null) return;
 
@@ -59,9 +58,8 @@ public class InventoryIconTab implements IconTab {
         int bgY = screenHeight / 2 - INV_HEIGHT / 2 + 10;
 
         Component infoText = Component.translatable("screen.radial.editor.icon_picker.inventory.info");
-        graphics.text(mc.font, infoText, screenWidth / 2 - mc.font.width(infoText) / 2, bgY - 15, 0xFFAAAAAA);
+        graphics.drawString(mc.font, infoText, screenWidth / 2 - mc.font.width(infoText) / 2, bgY - 15, 0xFFAAAAAA);
         graphics.blit(
-                RenderPipelines.GUI_TEXTURED,
                 INVENTORY_TEXTURE,
                 bgX,
                 bgY,
@@ -70,8 +68,7 @@ public class InventoryIconTab implements IconTab {
                 INV_WIDTH,
                 INV_HEIGHT,
                 256,
-                256,
-                0xFFFFFFFF);
+                256);
 
         // Hotbar
         for (int i = 0; i < 9; i++) {
@@ -82,7 +79,7 @@ public class InventoryIconTab implements IconTab {
                     mouseY,
                     bgX + 7 + i * 18,
                     bgY + 141,
-                    inventory.getNonEquipmentItems().get(i));
+                    inventory.getItem(i));
         }
 
         // Main Inventory
@@ -94,7 +91,7 @@ public class InventoryIconTab implements IconTab {
                     mouseY,
                     bgX + 7 + (i % 9) * 18,
                     bgY + 83 + (i / 9) * 18,
-                    inventory.getNonEquipmentItems().get(i + 9));
+                    inventory.getItem(i + 9));
         }
 
         // Armor
@@ -105,18 +102,18 @@ public class InventoryIconTab implements IconTab {
         }
 
         // Offhand
-        drawInvSlot(graphics, mc, mouseX, mouseY, bgX + 76, bgY + 61, inventory.player.getOffhandItem());
+        drawInvSlot(graphics, mc, mouseX, mouseY, bgX + 76, bgY + 61, mc.player.getOffhandItem());
     }
 
     private void drawInvSlot(
-            GuiGraphicsExtractor graphics, Minecraft mc, int mouseX, int mouseY, int x, int y, ItemStack stack) {
+            GuiGraphics graphics, Minecraft mc, int mouseX, int mouseY, int x, int y, ItemStack stack) {
         if (!stack.isEmpty()) {
-            graphics.fakeItem(stack, x + 1, y + 1);
+            graphics.renderFakeItem(stack, x + 1, y + 1);
         }
         if (isHovered(mouseX, mouseY, x, y)) {
             graphics.fill(x, y, x + INV_SLOT_SIZE, y + INV_SLOT_SIZE, 0x40FFFFFF);
             if (!stack.isEmpty()) {
-                graphics.setTooltipForNextFrame(mc.font, stack, mouseX, mouseY);
+                graphics.renderTooltip(mc.font, stack, mouseX, mouseY);
             }
         }
     }

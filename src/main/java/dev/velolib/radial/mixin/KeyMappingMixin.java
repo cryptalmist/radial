@@ -1,7 +1,6 @@
 package dev.velolib.radial.mixin;
 
 import dev.velolib.radial.ui.screen.RadialScreen;
-import net.fabricmc.fabric.api.client.keymapping.v1.KeyMappingHelper;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import org.lwjgl.glfw.GLFW;
@@ -17,14 +16,14 @@ public class KeyMappingMixin {
     private void allowRadialMovement(CallbackInfoReturnable<Boolean> cir) {
         Minecraft client = Minecraft.getInstance();
 
-        if (client.gui.screen() instanceof RadialScreen) {
+        if (client.screen instanceof RadialScreen) {
 
             KeyMapping self = (KeyMapping) (Object) this;
 
-            if (self.getCategory().equals(KeyMapping.Category.MOVEMENT)) {
+            if (self.getCategory().equals("key.categories.movement")) {
 
-                int keyCode = KeyMappingHelper.getBoundKeyOf(self).getValue();
-                long handle = client.getWindow().handle();
+                int keyCode = self.getKey().getValue();
+                long handle = client.getWindow().getWindow();
                 boolean isPhysicallyPressed = GLFW.glfwGetKey(handle, keyCode) == GLFW.GLFW_PRESS;
 
                 cir.setReturnValue(isPhysicallyPressed);

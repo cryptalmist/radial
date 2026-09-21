@@ -5,15 +5,14 @@ import dev.velolib.radial.util.PhosphorIconCache;
 import java.util.List;
 import java.util.function.Consumer;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.FontDescription;
 import net.minecraft.network.chat.Style;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 
 public class PhosphorIconTab extends GridIconTab<PhosphorIconCache.PhosphorIcon> {
 
-    private static final Identifier PHOSPHOR_FONT = Identifier.fromNamespaceAndPath("radial", "phosphor");
+    private static final ResourceLocation PHOSPHOR_FONT = ResourceLocation.fromNamespaceAndPath("radial", "phosphor");
 
     public PhosphorIconTab(Consumer<String> onSelect, Runnable onClose) {
         super(onSelect, onClose);
@@ -38,7 +37,7 @@ public class PhosphorIconTab extends GridIconTab<PhosphorIconCache.PhosphorIcon>
 
     @Override
     protected void renderIcon(
-            GuiGraphicsExtractor graphics,
+            GuiGraphics graphics,
             int x,
             int y,
             int mouseX,
@@ -47,16 +46,16 @@ public class PhosphorIconTab extends GridIconTab<PhosphorIconCache.PhosphorIcon>
             boolean hovered) {
         Minecraft client = Minecraft.getInstance();
         Component component = Component.literal(icon.character())
-                .setStyle(Style.EMPTY.withFont(new FontDescription.Resource(PHOSPHOR_FONT)));
+                .setStyle(Style.EMPTY.withFont(PHOSPHOR_FONT));
 
         int textWidth = client.font.width(component);
         int textX = x + (getSlotSize() - textWidth) / 2;
         int textY = y + (getSlotSize() - client.font.lineHeight) / 2 + 5;
 
-        graphics.text(client.font, component, textX, textY, 0xFFFFFFFF, false);
+        graphics.drawString(client.font, component, textX, textY, 0xFFFFFFFF, false);
 
         if (hovered) {
-            graphics.setTooltipForNextFrame(client.font, Component.literal(icon.name()), mouseX, mouseY);
+            graphics.renderTooltip(client.font, Component.literal(icon.name()), mouseX, mouseY);
         }
     }
 

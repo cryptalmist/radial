@@ -2,26 +2,19 @@ package dev.velolib.radial.render;
 
 import dev.velolib.radial.api.RadialSlot;
 import dev.velolib.radial.util.PhosphorIconCache;
-import java.util.Objects;
-import java.util.Optional;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
-import net.minecraft.client.renderer.RenderPipelines;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.FontDescription;
 import net.minecraft.network.chat.Style;
-import net.minecraft.resources.Identifier;
-import net.minecraft.world.effect.MobEffect;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.ItemStack;
 
 public final class SlotRenderHelper {
 
-    private static final Identifier PHOSPHOR_FONT = Identifier.fromNamespaceAndPath("radial", "phosphor");
-
-    private static final FontDescription PHOSPHOR_FONT_DESCRIPTION = new FontDescription.Resource(PHOSPHOR_FONT);
+    private static final ResourceLocation PHOSPHOR_FONT = ResourceLocation.fromNamespaceAndPath("radial", "phosphor");
 
     private SlotRenderHelper() {}
 
@@ -52,7 +45,7 @@ public final class SlotRenderHelper {
 
                                 if (hbIndex >= 0 && hbIndex < 9) {
 
-                                    return inv.getNonEquipmentItems().get(hbIndex);
+                                    return inv.getItem(hbIndex);
                                 }
                             }
 
@@ -65,7 +58,7 @@ public final class SlotRenderHelper {
 
                                 if (invIndex >= 0 && invIndex < 27) {
 
-                                    return inv.getNonEquipmentItems().get(invIndex + 9);
+                                    return inv.getItem(invIndex + 9);
                                 }
                             }
 
@@ -117,7 +110,7 @@ public final class SlotRenderHelper {
         return slot.getRenderStack();
     }
 
-    public static void renderSlotIcon(GuiGraphicsExtractor graphics, RadialSlot slot, float x, float y) {
+    public static void renderSlotIcon(GuiGraphics graphics, RadialSlot slot, float x, float y) {
         if (slot == null || slot.itemId == null || !slot.mode.shouldRenderIcon()) {
 
             return;
@@ -148,7 +141,7 @@ public final class SlotRenderHelper {
 
             int centerY = (int) y + Math.round((26 - 8) / 2.0f);
 
-            graphics.text(client.font, glyph, centerX, centerY, 0xFFFFFFFF);
+            graphics.drawString(client.font, glyph, centerX, centerY, 0xFFFFFFFF);
 
             return;
         }
@@ -158,27 +151,17 @@ public final class SlotRenderHelper {
 
             String effectKey = itemId.substring("radial:effect.".length());
 
-            Identifier id;
+            ResourceLocation id = ResourceLocation.tryParse(effectKey);
 
-            try {
-
-                id = Identifier.parse(effectKey);
-
-            } catch (Exception ignored) {
-
+            if (id == null || !BuiltInRegistries.MOB_EFFECT.containsKey(id)) {
                 return;
             }
 
-            Optional<MobEffect> effect = BuiltInRegistries.MOB_EFFECT.getOptional(id);
+            String path = id.getPath();
 
-            effect.ifPresent(value -> {
-                String path = Objects.requireNonNull(BuiltInRegistries.MOB_EFFECT.getKey(value))
-                        .getPath();
+            ResourceLocation spriteId = ResourceLocation.fromNamespaceAndPath("minecraft", "mob_effect/" + path);
 
-                Identifier spriteId = Identifier.fromNamespaceAndPath("minecraft", "mob_effect/" + path);
-
-                graphics.blitSprite(RenderPipelines.GUI_TEXTURED, spriteId, (int) x + 4, (int) y + 4, 18, 18);
-            });
+            graphics.blitSprite(spriteId, (int) x + 4, (int) y + 4, 18, 18);
 
             return;
         }
@@ -188,11 +171,11 @@ public final class SlotRenderHelper {
 
         if (stack != null && !stack.isEmpty()) {
 
-            graphics.fakeItem(stack, (int) x + 5, (int) y + 5);
+            graphics.renderFakeItem(stack, (int) x + 5, (int) y + 5);
         }
     }
 
-    private static void renderPhosphorIcon(GuiGraphicsExtractor graphics, String iconName, float x, float y) {
+    private static void renderPhosphorIcon(GuiGraphics graphics, String iconName, float x, float y) {
         PhosphorIconCache.PhosphorIcon icon = PhosphorIconCache.getIcons().stream()
                 .filter(candidate -> candidate.name().equals(iconName))
                 .findFirst()
@@ -206,7 +189,7 @@ public final class SlotRenderHelper {
 
         String glyph = icon.character();
 
-        Component component = Component.literal(glyph).setStyle(Style.EMPTY.withFont(PHOSPHOR_FONT_DESCRIPTION));
+        Component component = Component.literal(glyph).setStyle(Style.EMPTY.withFont(PHOSPHOR_FONT));
 
         int textWidth = client.font.width(component);
 
@@ -214,6 +197,6 @@ public final class SlotRenderHelper {
 
         int textY = (int) y + Math.round((26 - client.font.lineHeight) / 2.0F) + 4;
 
-        graphics.text(client.font, component, textX, textY, 0xFFFFFFFF, false);
+        graphics.drawString(client.font, component, textX, textY, 0xFFFFFFFF, false);
     }
 }

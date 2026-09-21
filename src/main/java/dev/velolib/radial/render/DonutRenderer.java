@@ -1,13 +1,14 @@
 package dev.velolib.radial.render;
 
 import com.mojang.blaze3d.platform.NativeImage;
+import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.math.Axis;
 import dev.velolib.radial.config.RadialConfig;
 import java.util.concurrent.CompletableFuture;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
-import net.minecraft.client.renderer.RenderPipelines;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.renderer.texture.DynamicTexture;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 
 /**
@@ -36,8 +37,8 @@ public class DonutRenderer implements AutoCloseable {
     private DynamicTexture baseTexture;
     private DynamicTexture hotTexture;
 
-    private Identifier baseTexId;
-    private Identifier hotTexId;
+    private ResourceLocation baseTexId;
+    private ResourceLocation hotTexId;
 
     /**
      * Tracks the current active background generation task.
@@ -145,7 +146,7 @@ public class DonutRenderer implements AutoCloseable {
      * @param resScale    The resolution scale to properly size the texture on screen.
      */
     public void renderSector(
-            GuiGraphicsExtractor graphics,
+            GuiGraphics graphics,
             float cx,
             float cy,
             float slotAngle,
@@ -162,18 +163,18 @@ public class DonutRenderer implements AutoCloseable {
             return;
         }
 
-        graphics.pose().pushMatrix();
-        graphics.pose().translate(cx, cy);
-        graphics.pose().rotate(slotAngle);
-        graphics.pose().translate(push * clampedEase, 0);
-        graphics.pose().scale(clampedEase / resScale, clampedEase / resScale);
+        graphics.pose().pushPose();
+        graphics.pose().translate(cx, cy, 0);
+        graphics.pose().mulPose(Axis.ZP.rotation(slotAngle));
+        graphics.pose().translate(push * clampedEase, 0, 0);
+        graphics.pose().scale(clampedEase / resScale, clampedEase / resScale, 1.0F);
 
         int offset = -texSize / 2;
-        Identifier texture = highlighted ? hotTexId : baseTexId;
+        ResourceLocation texture = highlighted ? hotTexId : baseTexId;
         int alpha = Mth.clamp((int) (clampedEase * 255.0f + 0.5f), 0, 255);
 
+        RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, alpha / 255.0F);
         graphics.blit(
-                RenderPipelines.GUI_TEXTURED,
                 texture,
                 offset,
                 offset,
@@ -182,10 +183,10 @@ public class DonutRenderer implements AutoCloseable {
                 texSize,
                 texSize,
                 texSize,
-                texSize,
-                (alpha << 24) | 0xFFFFFF);
+                texSize);
+        RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
 
-        graphics.pose().popMatrix();
+        graphics.pose().popPose();
     }
 
     /**
@@ -243,16 +244,18 @@ public class DonutRenderer implements AutoCloseable {
                             if (this.baseTexture != null) this.baseTexture.close();
                             if (this.hotTexture != null) this.hotTexture.close();
 
-                            this.baseTexture = new DynamicTexture(() -> "", images[0]);
-                            this.hotTexture = new DynamicTexture(() -> "", images[1]);
+                            this.baseTexture = new DynamicTexture(images[0]);
+                            this.hotTexture = new DynamicTexture(images[1]);
 
-                            this.baseTexId = Identifier.fromNamespaceAndPath("radial", "sector_base_" + this.idSuffix);
-                            this.hotTexId = Identifier.fromNamespaceAndPath("radial", "sector_hot_" + this.idSuffix);
+                            this.baseTexId =
+                                    ResourceLocation.fromNamespaceAndPath("radial", "sector_base_" + this.idSuffix);
+                            this.hotTexId =
+                                    ResourceLocation.fromNamespaceAndPath("radial", "sector_hot_" + this.idSuffix);
 
                             Minecraft.getInstance().getTextureManager().register(this.baseTexId, this.baseTexture);
                             Minecraft.getInstance().getTextureManager().register(this.hotTexId, this.hotTexture);
                         },
-                        Minecraft.getInstance());
+                        images -> Minecraft.getInstance().execute(images));
     }
 
     /**

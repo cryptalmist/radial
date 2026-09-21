@@ -8,20 +8,18 @@ import dev.isxander.yacl3.gui.YACLScreen;
 import dev.velolib.radial.render.DonutRenderer;
 import java.awt.*;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.Identifier;
-import org.jspecify.annotations.NonNull;
+import net.minecraft.resources.ResourceLocation;
 
 public class RadialConfigScreen {
 
-    private static final Identifier SLOT_TEXTURE =
-            Identifier.fromNamespaceAndPath("minecraft", "gamemode_switcher/slot");
+    private static final ResourceLocation SLOT_TEXTURE =
+            ResourceLocation.fromNamespaceAndPath("minecraft", "gamemode_switcher/slot");
 
-    private static final Identifier SELECTION_TEXTURE =
-            Identifier.fromNamespaceAndPath("minecraft", "gamemode_switcher/selection");
+    private static final ResourceLocation SELECTION_TEXTURE =
+            ResourceLocation.fromNamespaceAndPath("minecraft", "gamemode_switcher/selection");
 
     private static final DonutRenderer PREVIEW_RENDERER = new DonutRenderer("preview");
 
@@ -296,16 +294,7 @@ public class RadialConfigScreen {
                 if (widget == null) {
                     widget = new AbstractWidget(dimension) {
                         @Override
-                        public boolean isFocused() {
-                            return false;
-                        }
-
-                        @Override
-                        public void setFocused(boolean focused) {}
-
-                        @Override
-                        public void extractRenderState(
-                                @NonNull GuiGraphicsExtractor graphics, int mouseX, int mouseY, float delta) {
+                        public void render(GuiGraphics graphics, int mouseX, int mouseY, float delta) {
                             if (showPreview) {
                                 renderPreview(graphics, config);
                             }
@@ -341,7 +330,7 @@ public class RadialConfigScreen {
      * Detection-zone preview
      */
     private static void drawAnnulus(
-            GuiGraphicsExtractor graphics, float cx, float cy, float innerRadius, float outerRadius) {
+            GuiGraphics graphics, float cx, float cy, float innerRadius, float outerRadius) {
         if (outerRadius <= innerRadius) return;
 
         float outerSquared = outerRadius * outerRadius;
@@ -383,7 +372,7 @@ public class RadialConfigScreen {
     /*
      * Preview rendering
      */
-    private static void renderPreview(GuiGraphicsExtractor graphics, RadialConfig config) {
+    private static void renderPreview(GuiGraphics graphics, RadialConfig config) {
         Minecraft client = Minecraft.getInstance();
 
         int cx = client.getWindow().getGuiScaledWidth() / 2;
@@ -432,33 +421,19 @@ public class RadialConfigScreen {
             float hoverScale =
                     config.enableHoverAnimation ? 1.0F + PREVIEW_HOVER_SCALE * (highlighted ? 1.0F : 0.0F) : 1.0F;
 
-            graphics.pose().pushMatrix();
-            graphics.pose().translate(slotX, slotY);
-            graphics.pose().scale(hoverScale, hoverScale);
+            graphics.pose().pushPose();
+            graphics.pose().translate(slotX, slotY, 0);
+            graphics.pose().scale(hoverScale, hoverScale, 1.0F);
 
             int drawOffset = -SLOT_SIZE / 2;
 
-            graphics.blitSprite(
-                    RenderPipelines.GUI_TEXTURED,
-                    SLOT_TEXTURE,
-                    drawOffset,
-                    drawOffset,
-                    SLOT_SIZE,
-                    SLOT_SIZE,
-                    0xFFFFFFFF);
+            graphics.blitSprite(SLOT_TEXTURE, drawOffset, drawOffset, SLOT_SIZE, SLOT_SIZE);
 
             if (highlighted) {
-                graphics.blitSprite(
-                        RenderPipelines.GUI_TEXTURED,
-                        SELECTION_TEXTURE,
-                        drawOffset,
-                        drawOffset,
-                        SLOT_SIZE,
-                        SLOT_SIZE,
-                        0xFFFFFFFF);
+                graphics.blitSprite(SELECTION_TEXTURE, drawOffset, drawOffset, SLOT_SIZE, SLOT_SIZE);
             }
 
-            graphics.pose().popMatrix();
+            graphics.pose().popPose();
         }
     }
 }

@@ -10,7 +10,7 @@ import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.NbtOps;
 import net.minecraft.nbt.Tag;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.resources.RegistryOps;
 import net.minecraft.world.item.ItemStack;
 
@@ -30,7 +30,7 @@ public class EncoderUtils {
         }
 
         // 1. Get the base Item ID
-        Identifier itemId = BuiltInRegistries.ITEM.getKey(stack.getItem());
+        ResourceLocation itemId = BuiltInRegistries.ITEM.getKey(stack.getItem());
         StringBuilder command = new StringBuilder(itemId.toString());
 
         // 2. Fetch the patch containing all modifications made to this specific item vs its default state
@@ -46,7 +46,7 @@ public class EncoderUtils {
 
             for (Map.Entry<DataComponentType<?>, Optional<?>> entry : patch.entrySet()) {
                 DataComponentType<?> type = entry.getKey();
-                Identifier typeId = BuiltInRegistries.DATA_COMPONENT_TYPE.getKey(type);
+                ResourceLocation typeId = BuiltInRegistries.DATA_COMPONENT_TYPE.getKey(type);
                 Optional<?> value = entry.getValue();
 
                 if (value.isPresent()) {

@@ -8,23 +8,20 @@ import dev.velolib.radial.render.SlotRenderHelper;
 import dev.velolib.radial.ui.widget.DropdownButtonWidget;
 import dev.velolib.radial.ui.widget.DropdownMenuWidget;
 import java.util.List;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.components.StringWidget;
 import net.minecraft.client.gui.layouts.FrameLayout;
 import net.minecraft.client.gui.layouts.LinearLayout;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.client.input.MouseButtonEvent;
-import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.Identifier;
-import org.jspecify.annotations.NonNull;
+import net.minecraft.resources.ResourceLocation;
 
 public class SlotEditorScreen extends Screen {
 
-    private static final Identifier SLOT_TEXTURE =
-            Identifier.fromNamespaceAndPath("minecraft", "gamemode_switcher/slot");
+    private static final ResourceLocation SLOT_TEXTURE =
+            ResourceLocation.fromNamespaceAndPath("minecraft", "gamemode_switcher/slot");
     private static final int SLOT_SIZE = 26;
 
     // LAYOUT CONSTANTS
@@ -154,7 +151,7 @@ public class SlotEditorScreen extends Screen {
     }
 
     @Override
-    public void extractRenderState(@NonNull GuiGraphicsExtractor graphics, int mouseX, int mouseY, float delta) {
+    public void render(GuiGraphics graphics, int mouseX, int mouseY, float delta) {
         graphics.fillGradient(0, 0, width, height, 0xC0101010, 0xD0101010);
 
         int centerX = width / 2;
@@ -165,7 +162,7 @@ public class SlotEditorScreen extends Screen {
         int iconY = (nameField != null) ? nameField.getY() - SLOT_SIZE - 20 : height / 2 - 110;
 
         // Draw background slot
-        graphics.blitSprite(RenderPipelines.GUI_TEXTURED, SLOT_TEXTURE, centerX - 13, iconY, SLOT_SIZE, SLOT_SIZE);
+        graphics.blitSprite(SLOT_TEXTURE, centerX - 13, iconY, SLOT_SIZE, SLOT_SIZE);
 
         SlotRenderHelper.renderSlotIcon(graphics, slot, centerX - 13, iconY);
 
@@ -177,10 +174,10 @@ public class SlotEditorScreen extends Screen {
         int passMouseX = hoveringMenu ? -999 : mouseX;
         int passMouseY = hoveringMenu ? -999 : mouseY;
 
-        super.extractRenderState(graphics, passMouseX, passMouseY, delta);
+        super.render(graphics, passMouseX, passMouseY, delta);
 
         if (hoveringMenu) {
-            this.modeDropdown.getActiveMenu().extractRenderState(graphics, mouseX, mouseY, delta);
+            this.modeDropdown.getActiveMenu().render(graphics, mouseX, mouseY, delta);
         }
     }
 
@@ -195,26 +192,26 @@ public class SlotEditorScreen extends Screen {
             slot.clearCache();
         }
 
-        minecraft.gui.setScreen(null);
+        minecraft.setScreen(null);
     }
 
     @Override
-    public boolean mouseClicked(@NonNull MouseButtonEvent click, boolean doubled) {
+    public boolean mouseClicked(double mouseX, double mouseY, int button) {
         if (this.modeDropdown != null && this.modeDropdown.isMenuOpen()) {
             DropdownMenuWidget<SlotMode> floatingMenu = this.modeDropdown.getActiveMenu();
 
-            if (floatingMenu.isMouseOver(click.x(), click.y())) {
-                floatingMenu.mouseClicked(click, doubled);
+            if (floatingMenu.isMouseOver(mouseX, mouseY)) {
+                floatingMenu.mouseClicked(mouseX, mouseY, button);
                 return true;
             } else //noinspection StatementWithEmptyBody
-            if (this.modeDropdown.isMouseOver(click.x(), click.y())) {
+            if (this.modeDropdown.isMouseOver(mouseX, mouseY)) {
                 // Let the click fall through so the button can close itself
             } else {
                 this.modeDropdown.closeMenu();
             }
         }
 
-        return super.mouseClicked(click, doubled);
+        return super.mouseClicked(mouseX, mouseY, button);
     }
 
     @Override

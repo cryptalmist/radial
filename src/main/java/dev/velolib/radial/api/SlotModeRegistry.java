@@ -3,22 +3,22 @@ package dev.velolib.radial.api;
 import dev.velolib.radial.mode.*;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import net.fabricmc.loader.api.FabricLoader;
-import net.minecraft.resources.Identifier;
+import java.util.ServiceLoader;
+import net.minecraft.resources.ResourceLocation;
 
 public class SlotModeRegistry {
-    private static final Map<Identifier, SlotMode> REGISTRY = new LinkedHashMap<>();
-    private static final Identifier EMPTY_ID = Identifier.fromNamespaceAndPath("radial", "empty");
+    private static final Map<ResourceLocation, SlotMode> REGISTRY = new LinkedHashMap<>();
+    private static final ResourceLocation EMPTY_ID = ResourceLocation.fromNamespaceAndPath("radial", "empty");
     private static boolean initialized = false;
 
-    public static void register(Identifier id, SlotMode mode) {
+    public static void register(ResourceLocation id, SlotMode mode) {
         if (REGISTRY.containsKey(id)) {
             throw new IllegalArgumentException("Duplicate registration for mode ID: " + id);
         }
         REGISTRY.put(id, mode);
     }
 
-    public static Map<Identifier, SlotMode> getRegisteredModes() {
+    public static Map<ResourceLocation, SlotMode> getRegisteredModes() {
         return java.util.Collections.unmodifiableMap(REGISTRY);
     }
 
@@ -27,15 +27,15 @@ public class SlotModeRegistry {
         initialized = true;
 
         register(EMPTY_ID, new EmptySlotMode());
-        register(Identifier.fromNamespaceAndPath("radial", "chat"), new ChatSlotMode());
-        register(Identifier.fromNamespaceAndPath("radial", "keybind"), new KeybindSlotMode());
-        register(Identifier.fromNamespaceAndPath("radial", "shortcut"), new ShortcutSlotMode());
-        register(Identifier.fromNamespaceAndPath("radial", "malilib"), new MalilibSlotMode());
-        register(Identifier.fromNamespaceAndPath("radial", "submenu"), new SubmenuSlotMode());
+        register(ResourceLocation.fromNamespaceAndPath("radial", "chat"), new ChatSlotMode());
+        register(ResourceLocation.fromNamespaceAndPath("radial", "keybind"), new KeybindSlotMode());
+        register(ResourceLocation.fromNamespaceAndPath("radial", "shortcut"), new ShortcutSlotMode());
+        register(ResourceLocation.fromNamespaceAndPath("radial", "malilib"), new MalilibSlotMode());
+        register(ResourceLocation.fromNamespaceAndPath("radial", "submenu"), new SubmenuSlotMode());
 
-        FabricLoader.getInstance()
-                .getEntrypointContainers("radial", RadialApiEntrypoint.class)
-                .forEach(container -> container.getEntrypoint().registerSlotModes());
+        // Third-party addons can contribute modes via Java's ServiceLoader
+        // (META-INF/services/dev.velolib.radial.api.RadialApiEntrypoint).
+        ServiceLoader.load(RadialApiEntrypoint.class).forEach(RadialApiEntrypoint::registerSlotModes);
     }
 
     public static SlotMode getDefaultMode() {

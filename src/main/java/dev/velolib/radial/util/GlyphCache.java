@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import net.minecraft.client.Minecraft;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.Resource;
 import net.minecraft.server.packs.resources.ResourceManager;
 
@@ -36,13 +36,13 @@ public final class GlyphCache {
 
         ResourceManager manager = Minecraft.getInstance().getResourceManager();
 
-        Identifier targetFont = Identifier.fromNamespaceAndPath("minecraft", "font/include/default.json");
+        ResourceLocation targetFont = ResourceLocation.fromNamespaceAndPath("minecraft", "font/include/default.json");
 
         Optional<Resource> resourceOpt = manager.getResource(targetFont);
 
         if (resourceOpt.isEmpty()) {
 
-            targetFont = Identifier.fromNamespaceAndPath("minecraft", "font/default.json");
+            targetFont = ResourceLocation.fromNamespaceAndPath("minecraft", "font/default.json");
 
             resourceOpt = manager.getResource(targetFont);
         }

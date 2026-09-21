@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import net.minecraft.client.Minecraft;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.Resource;
 import net.minecraft.server.packs.resources.ResourceManager;
 
@@ -35,7 +36,7 @@ public final class PhosphorIconCache {
 
         ResourceManager manager = Minecraft.getInstance().getResourceManager();
 
-        var identifier = net.minecraft.resources.Identifier.fromNamespaceAndPath("radial", "phosphor/icons.json");
+        var identifier = ResourceLocation.fromNamespaceAndPath("radial", "phosphor/icons.json");
 
         Optional<Resource> resource = manager.getResource(identifier);
 

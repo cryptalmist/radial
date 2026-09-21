@@ -38,7 +38,7 @@ public class SubmenuSlotMode extends IconEnabledSlotMode {
             slot.children.add(new RadialSlot(
                     "Sub Slot " + (slot.children.size() + 1),
                     SlotModeRegistry.getRegisteredModes()
-                            .get(net.minecraft.resources.Identifier.fromNamespaceAndPath("radial", "empty")),
+                            .get(net.minecraft.resources.ResourceLocation.fromNamespaceAndPath("radial", "empty")),
                     "",
                     "minecraft:stone"));
         }

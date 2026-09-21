@@ -4,20 +4,18 @@ import java.util.List;
 import java.util.function.Function;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
-import net.minecraft.client.input.MouseButtonEvent;
-import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import org.jspecify.annotations.NonNull;
 
 public class DropdownMenuWidget<T> extends AbstractWidget {
     private static final int MAX_VISIBLE_ITEMS = 6;
-    private static final Identifier SPRITE_HIGHLIGHTED =
-            Identifier.fromNamespaceAndPath("minecraft", "widget/text_field_highlighted");
+    private static final ResourceLocation SPRITE_HIGHLIGHTED =
+            ResourceLocation.fromNamespaceAndPath("minecraft", "widget/text_field_highlighted");
     private final List<T> options;
     private final T currentSelection;
     private final Function<T, Component> labelMapper;
@@ -67,9 +65,9 @@ public class DropdownMenuWidget<T> extends AbstractWidget {
     }
 
     @Override
-    public boolean mouseClicked(final MouseButtonEvent event, final boolean doubleClick) {
-        if (this.isMouseOver(event.x(), event.y())) {
-            this.onClick(event, doubleClick);
+    public boolean mouseClicked(double mouseX, double mouseY, int button) {
+        if (this.isMouseOver(mouseX, mouseY)) {
+            this.onClick(mouseX, mouseY);
             return true;
         }
 
@@ -78,8 +76,7 @@ public class DropdownMenuWidget<T> extends AbstractWidget {
     }
 
     @Override
-    public void onClick(final MouseButtonEvent event, final boolean doubleClick) {
-        double mouseY = event.y();
+    public void onClick(double mouseX, double mouseY) {
 
         int index = (int) ((mouseY - getY() + this.scrollAmount) / itemHeight);
 
@@ -91,11 +88,11 @@ public class DropdownMenuWidget<T> extends AbstractWidget {
     }
 
     @Override
-    protected void extractWidgetRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float delta) {
+    protected void renderWidget(GuiGraphics graphics, int mouseX, int mouseY, float delta) {
         Minecraft mc = Minecraft.getInstance();
         Font font = mc.font;
 
-        graphics.blitSprite(RenderPipelines.GUI_TEXTURED, SPRITE_HIGHLIGHTED, getX(), getY(), width, height);
+        graphics.blitSprite(SPRITE_HIGHLIGHTED, getX(), getY(), width, height);
 
         graphics.enableScissor(getX() + 1, getY() + 1, getX() + width - 1, getY() + height - 1);
 
@@ -113,12 +110,12 @@ public class DropdownMenuWidget<T> extends AbstractWidget {
                     && mouseY <= getY() + height;
 
             if (isItemHovered) {
-                graphics.blitSprite(RenderPipelines.GUI_TEXTURED, SPRITE_HIGHLIGHTED, getX(), itemY, width, itemHeight);
+                graphics.blitSprite(SPRITE_HIGHLIGHTED, getX(), itemY, width, itemHeight);
             }
 
             Component text = labelMapper.apply(option);
             int optionColor = option.equals(currentSelection) ? 0xFF55FF55 : 0xFFFFFFFF;
-            graphics.text(font, text, getX() + 4, itemY + (itemHeight - 8) / 2, optionColor);
+            graphics.drawString(font, text, getX() + 4, itemY + (itemHeight - 8) / 2, optionColor);
         }
         graphics.disableScissor();
 

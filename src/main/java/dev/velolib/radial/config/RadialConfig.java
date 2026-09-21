@@ -19,18 +19,18 @@ import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.List;
-import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.network.chat.Component;
+import net.neoforged.fml.loading.FMLPaths;
 
 public class RadialConfig {
 
     public static final int CONFIG_VERSION = 3;
 
     private static final File CONFIG_FILE =
-            FabricLoader.getInstance().getConfigDir().resolve("radial.json").toFile();
+            FMLPaths.CONFIGDIR.get().resolve("radial.json").toFile();
 
     private static final File TEMP_FILE =
-            FabricLoader.getInstance().getConfigDir().resolve("radial.json.tmp").toFile();
+            FMLPaths.CONFIGDIR.get().resolve("radial.json.tmp").toFile();
 
     private static final Gson GSON = new GsonBuilder()
             .setPrettyPrinting()

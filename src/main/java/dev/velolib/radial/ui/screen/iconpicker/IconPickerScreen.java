@@ -4,14 +4,12 @@ import dev.velolib.radial.ui.screen.iconpicker.tabs.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.Component;
-import org.jspecify.annotations.NonNull;
 
 public class IconPickerScreen extends Screen {
     private final Screen parent;
@@ -86,25 +84,25 @@ public class IconPickerScreen extends Screen {
     }
 
     @Override
-    public void extractRenderState(@NonNull GuiGraphicsExtractor graphics, int mouseX, int mouseY, float delta) {
+    public void render(GuiGraphics graphics, int mouseX, int mouseY, float delta) {
         graphics.fillGradient(0, 0, width, height, 0xC0101010, 0xD0101010);
 
         // Let the tab render its background/custom UI
         currentTab.render(graphics, mouseX, mouseY, delta);
 
-        super.extractRenderState(graphics, mouseX, mouseY, delta);
+        super.render(graphics, mouseX, mouseY, delta);
     }
 
     @Override
-    public boolean mouseClicked(@NonNull MouseButtonEvent click, boolean doubled) {
-        if (currentTab.mouseClicked(click.x(), click.y(), click.button())) {
+    public boolean mouseClicked(double mouseX, double mouseY, int button) {
+        if (currentTab.mouseClicked(mouseX, mouseY, button)) {
             return true;
         }
-        return super.mouseClicked(click, doubled);
+        return super.mouseClicked(mouseX, mouseY, button);
     }
 
     @Override
     public void onClose() {
-        minecraft.gui.setScreen(parent);
+        minecraft.setScreen(parent);
     }
 }

@@ -55,7 +55,7 @@ public abstract class IconEnabledSlotMode implements SlotMode {
         // Browse Button
         Button browseIconButton = Button.builder(
                         Component.translatable("screen.radial.editor.browse"),
-                        _ -> Minecraft.getInstance().gui.setScreen(new IconPickerScreen(screen, id -> {
+                        _ -> Minecraft.getInstance().setScreen(new IconPickerScreen(screen, id -> {
                             iconField.setValue(id);
                             slot.itemId = id;
                             slot.clearCache();

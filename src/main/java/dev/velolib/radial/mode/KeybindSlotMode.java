@@ -4,7 +4,6 @@ import com.mojang.blaze3d.platform.InputConstants;
 import dev.velolib.radial.RadialClient;
 import dev.velolib.radial.api.RadialSlot;
 import dev.velolib.radial.api.SlotActionContext;
-import dev.velolib.radial.mixin.KeyMappingAccessor;
 import dev.velolib.radial.mode.base.IconEnabledSlotMode;
 import dev.velolib.radial.ui.screen.KeybindPickerScreen;
 import dev.velolib.radial.ui.screen.SlotEditorScreen;
@@ -17,7 +16,6 @@ import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.components.StringWidget;
 import net.minecraft.client.gui.layouts.LinearLayout;
-import net.minecraft.client.input.KeyEvent;
 import net.minecraft.network.chat.Component;
 import org.lwjgl.glfw.GLFW;
 
@@ -27,13 +25,16 @@ public class KeybindSlotMode extends IconEnabledSlotMode {
     static {
         // TODO: add crash debug key
 
-        SPECIAL_ACTIONS.put(new KeyMapping("key.screenshot", GLFW.GLFW_KEY_F2, KeyMapping.Category.MISC), client -> {
-            Screenshot.grab(client, false);
+        SPECIAL_ACTIONS.put(new KeyMapping("key.screenshot", GLFW.GLFW_KEY_F2, "key.categories.misc"), client -> {
+            Screenshot.grab(
+                    client.gameDirectory,
+                    client.getMainRenderTarget(),
+                    message -> client.gui.getChat().addMessage(message));
         });
 
         SPECIAL_ACTIONS.put(
-                new KeyMapping("key.debug.overlay", GLFW.GLFW_KEY_F3, KeyMapping.Category.DEBUG), client -> {
-                    client.getDebugOverlay().showDebugScreen();
+                new KeyMapping("key.debug.overlay", GLFW.GLFW_KEY_F3, "key.categories.debug"), client -> {
+                    client.options.renderDebug.set(!client.options.renderDebug.get());
                 });
     }
 
@@ -73,7 +74,7 @@ public class KeybindSlotMode extends IconEnabledSlotMode {
 
         Button valueBrowseButton = Button.builder(
                         Component.translatable("screen.radial.editor.select"),
-                        _ -> Minecraft.getInstance().gui.setScreen(new KeybindPickerScreen(screen, id -> {
+                        _ -> Minecraft.getInstance().setScreen(new KeybindPickerScreen(screen, id -> {
                             valueField.setValue(id);
                             slot.value = id;
                         })))
@@ -106,10 +107,8 @@ public class KeybindSlotMode extends IconEnabledSlotMode {
                 if (dev.velolib.radial.RadialClient.isRadialInternalKey(key)) return;
 
                 if (slot.value.startsWith("key.debug")) {
-                    InputConstants.Key inputKey = ((KeyMappingAccessor) key).getKey();
-                    int keyCode = inputKey.getValue();
-                    var dummyEvent = new KeyEvent(keyCode, 0, 0);
-                    client.keyboardHandler.handleDebugKeys(dummyEvent);
+                    InputConstants.Key inputKey = key.getKey();
+                    client.keyboardHandler.handleDebugKeys(inputKey.getValue());
                 }
 
                 RadialClient.scheduleKeyPress(key);

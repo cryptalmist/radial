@@ -4,8 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
-import net.minecraft.client.gui.components.ObjectSelectionList;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.AbstractSelectionList;
 import net.minecraft.client.gui.components.Renderable;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.network.chat.Component;
@@ -28,7 +28,7 @@ public abstract class GridIconTab<T> implements IconTab {
     protected abstract List<T> search(String query);
 
     protected abstract void renderIcon(
-            GuiGraphicsExtractor graphics, int x, int y, int mouseX, int mouseY, T item, boolean hovered);
+            GuiGraphics graphics, int x, int y, int mouseX, int mouseY, T item, boolean hovered);
 
     protected abstract void selectIcon(T item);
 
@@ -43,7 +43,8 @@ public abstract class GridIconTab<T> implements IconTab {
 
         listWidget = new IconGridList(Minecraft.getInstance(), listWidth, Math.max(1, bottom - top), top, 24);
 
-        listWidget.updateSizeAndPosition(listWidth, Math.max(1, bottom - top), left, top);
+        listWidget.updateSizeAndPosition(listWidth, Math.max(1, bottom - top), top);
+        listWidget.setX(left);
 
         addRenderable.accept(listWidget);
         addWidget.accept(listWidget);
@@ -76,7 +77,7 @@ public abstract class GridIconTab<T> implements IconTab {
     }
 
     @Override
-    public void render(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float delta) {
+    public void render(GuiGraphics graphics, int mouseX, int mouseY, float delta) {
         /* Managed by listWidget */
     }
 
@@ -90,7 +91,7 @@ public abstract class GridIconTab<T> implements IconTab {
         return true;
     }
 
-    private class IconGridList extends ObjectSelectionList<IconGridEntry> {
+    private class IconGridList extends AbstractSelectionList<IconGridEntry> {
 
         public IconGridList(Minecraft mc, int w, int h, int y, int rowHeight) {
             super(mc, w, h, y, rowHeight);
@@ -107,19 +108,30 @@ public abstract class GridIconTab<T> implements IconTab {
         }
     }
 
-    private class IconGridEntry extends ObjectSelectionList.Entry<IconGridEntry> {
+    private class IconGridEntry extends AbstractSelectionList.Entry<IconGridEntry> {
 
         private final List<T> items;
+        private int lastLeft;
+        private int lastTop;
 
         private IconGridEntry(List<T> items) {
             this.items = items;
         }
 
         @Override
-        public void extractContent(
-                @NonNull GuiGraphicsExtractor graphics, int mouseX, int mouseY, boolean hovered, float delta) {
-            int left = getContentX();
-            int top = getContentY();
+        public void render(
+                GuiGraphics graphics,
+                int index,
+                int top,
+                int left,
+                int width,
+                int height,
+                int mouseX,
+                int mouseY,
+                boolean hovered,
+                float delta) {
+            this.lastLeft = left;
+            this.lastTop = top;
             int slotSize = getSlotSize();
 
             int verticalOffset = Math.max(0, (24 - slotSize) / 2);
@@ -139,8 +151,8 @@ public abstract class GridIconTab<T> implements IconTab {
         }
 
         @Override
-        public boolean mouseClicked(net.minecraft.client.input.MouseButtonEvent event, boolean doubleClick) {
-            if (event.button() != 0) {
+        public boolean mouseClicked(double mouseX, double mouseY, int button) {
+            if (button != 0) {
                 return false;
             }
 
@@ -149,10 +161,10 @@ public abstract class GridIconTab<T> implements IconTab {
             int verticalOffset = Math.max(0, (24 - slotSize) / 2);
 
             for (int i = 0; i < items.size(); i++) {
-                int x = getContentX() + i * slotSize;
-                int y = getContentY() + verticalOffset;
+                int x = lastLeft + i * slotSize;
+                int y = lastTop + verticalOffset;
 
-                if (event.x() >= x && event.x() < x + slotSize && event.y() >= y && event.y() < y + slotSize) {
+                if (mouseX >= x && mouseX < x + slotSize && mouseY >= y && mouseY < y + slotSize) {
 
                     selectIcon(items.get(i));
                     return true;

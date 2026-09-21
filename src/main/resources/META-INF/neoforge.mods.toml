@@ -1,0 +1,32 @@
+modLoader="javafml"
+loaderVersion="[4,)"
+issueTrackerURL="https://github.com/velolib/radial/issues"
+license="GPL-3.0"
+
+[[mods]]
+modId="radial"
+version="${mod_version}"
+displayName="Radial"
+authors="velolib"
+description="A simple and opinionated Minecraft radial menu mod that works flawlessly out of the box."
+
+[[mixins]]
+config="radial.mixins.json"
+
+[dependencies.radial]
+    minecraft="[1.21.1,1.22)"
+    neoforge="[21.1,)"
+
+[[dependencies.radial]]
+    modId="yet_another_config_lib_v3"
+    mandatory=false
+    versionRange="[3.8,)"
+    ordering="NONE"
+    side="CLIENT"
+
+[[dependencies.radial]]
+    modId="mafglib"
+    mandatory=false
+    versionRange="[0.4,)"
+    ordering="NONE"
+    side="CLIENT"

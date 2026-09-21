@@ -6,12 +6,11 @@ import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.AbstractSelectionList;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.EditBox;
-import net.minecraft.client.gui.components.ObjectSelectionList;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.Component;
 import org.jspecify.annotations.NonNull;
 
@@ -68,7 +67,8 @@ public class KeybindPickerScreen extends Screen {
 
         keybindList = new KeybindList(Minecraft.getInstance(), listWidth, listHeight, listTop, ENTRY_HEIGHT);
 
-        keybindList.updateSizeAndPosition(listWidth, listHeight, listLeft, listTop);
+        keybindList.updateSizeAndPosition(listWidth, listHeight, listTop);
+        keybindList.setX(listLeft);
 
         addRenderableWidget(keybindList);
 
@@ -98,7 +98,9 @@ public class KeybindPickerScreen extends Screen {
                     String actionName =
                             Component.translatable(key.getName()).getString().toLowerCase();
 
-                    String category = key.getCategory().label().getString().toLowerCase();
+                    String category = Component.translatable(key.getCategory())
+                            .getString()
+                            .toLowerCase();
 
                     return actionName.contains(q) || category.contains(q);
                 })
@@ -110,19 +112,19 @@ public class KeybindPickerScreen extends Screen {
     }
 
     @Override
-    public void extractRenderState(@NonNull GuiGraphicsExtractor graphics, int mouseX, int mouseY, float delta) {
+    public void render(GuiGraphics graphics, int mouseX, int mouseY, float delta) {
 
         graphics.fillGradient(0, 0, width, height, 0xC0101010, 0xD0101010);
 
-        super.extractRenderState(graphics, mouseX, mouseY, delta);
+        super.render(graphics, mouseX, mouseY, delta);
     }
 
     @Override
     public void onClose() {
-        minecraft.gui.setScreen(parent);
+        minecraft.setScreen(parent);
     }
 
-    private static class KeybindList extends ObjectSelectionList<KeybindEntry> {
+    private static class KeybindList extends AbstractSelectionList<KeybindEntry> {
 
         private KeybindList(Minecraft minecraft, int width, int height, int y, int itemHeight) {
 
@@ -135,7 +137,7 @@ public class KeybindPickerScreen extends Screen {
         }
     }
 
-    private static class KeybindEntry extends ObjectSelectionList.Entry<KeybindEntry> {
+    private static class KeybindEntry extends AbstractSelectionList.Entry<KeybindEntry> {
 
         private final KeyMapping key;
         private final Consumer<String> onSelect;
@@ -149,15 +151,22 @@ public class KeybindPickerScreen extends Screen {
         }
 
         @Override
-        public void extractContent(
-                GuiGraphicsExtractor graphics, int mouseX, int mouseY, boolean hovered, float delta) {
+        public void render(
+                GuiGraphics graphics,
+                int index,
+                int top,
+                int left,
+                int width,
+                int height,
+                int mouseX,
+                int mouseY,
+                boolean hovered,
+                float delta) {
 
             Minecraft client = Minecraft.getInstance();
 
-            int left = getContentX();
-            int top = getContentY();
-            int right = getContentRight();
-            int bottom = getContentBottom();
+            int right = left + width;
+            int bottom = top + height;
 
             graphics.fill(left, top + 1, right, bottom - 1, hovered ? 0x80FFFFFF : 0x40000000);
 
@@ -169,19 +178,19 @@ public class KeybindPickerScreen extends Screen {
 
             int textY = top + ((bottom - top) - client.font.lineHeight) / 2;
 
-            graphics.text(client.font, display, left + 8, textY, 0xFFFFFFFF);
+            graphics.drawString(client.font, display, left + 8, textY, 0xFFFFFFFF);
 
-            Component category = key.getCategory().label();
+            Component category = Component.translatable(key.getCategory());
 
             int categoryWidth = client.font.width(category);
 
-            graphics.text(client.font, category, right - categoryWidth - 8, textY, 0xFFAAAAAA);
+            graphics.drawString(client.font, category, right - categoryWidth - 8, textY, 0xFFAAAAAA);
         }
 
         @Override
-        public boolean mouseClicked(MouseButtonEvent event, boolean doubleClick) {
+        public boolean mouseClicked(double mouseX, double mouseY, int button) {
 
-            if (event.button() != 0) {
+            if (button != 0) {
                 return false;
             }
 

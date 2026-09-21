@@ -1,6 +1,8 @@
 package dev.velolib.radial.ui.screen;
 
 import com.mojang.blaze3d.platform.InputConstants;
+import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.math.Axis;
 import dev.velolib.radial.RadialClient;
 import dev.velolib.radial.api.RadialSlot;
 import dev.velolib.radial.api.SlotActionContext;
@@ -10,26 +12,22 @@ import dev.velolib.radial.render.SlotRenderHelper;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
-import net.fabricmc.fabric.api.client.keymapping.v1.KeyMappingHelper;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.client.input.MouseButtonEvent;
-import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import org.jspecify.annotations.NonNull;
 import org.lwjgl.glfw.GLFW;
 
 public class RadialScreen extends Screen {
 
-    private static final Identifier SLOT_TEXTURE =
-            Identifier.fromNamespaceAndPath("minecraft", "gamemode_switcher/slot");
-    private static final Identifier SELECTION_TEXTURE =
-            Identifier.fromNamespaceAndPath("minecraft", "gamemode_switcher/selection");
+    private static final ResourceLocation SLOT_TEXTURE =
+            ResourceLocation.fromNamespaceAndPath("minecraft", "gamemode_switcher/slot");
+    private static final ResourceLocation SELECTION_TEXTURE =
+            ResourceLocation.fromNamespaceAndPath("minecraft", "gamemode_switcher/selection");
 
     private static final int SLOT_SIZE = 26;
     private static final int ITEM_SIZE = 16;
@@ -74,13 +72,13 @@ public class RadialScreen extends Screen {
         RadialConfig.ActivationMode mode = RadialConfig.INSTANCE.activationMode;
         if (mode == RadialConfig.ActivationMode.SCROLL_CLICK || mode == RadialConfig.ActivationMode.SCROLL_RELEASE) {
             hoveredSlot = 0; // Default to first slot in scroll mode
-            GLFW.glfwSetInputMode(minecraft.getWindow().handle(), GLFW.GLFW_CURSOR, GLFW.GLFW_CURSOR_HIDDEN);
+            GLFW.glfwSetInputMode(minecraft.getWindow().getWindow(), GLFW.GLFW_CURSOR, GLFW.GLFW_CURSOR_HIDDEN);
         }
     }
 
     @Override
     public void removed() {
-        GLFW.glfwSetInputMode(minecraft.getWindow().handle(), GLFW.GLFW_CURSOR, GLFW.GLFW_CURSOR_NORMAL);
+        GLFW.glfwSetInputMode(minecraft.getWindow().getWindow(), GLFW.GLFW_CURSOR, GLFW.GLFW_CURSOR_NORMAL);
         super.removed();
     }
 
@@ -148,16 +146,16 @@ public class RadialScreen extends Screen {
     // --- Render Loop ---
 
     @Override
-    public void extractRenderState(@NonNull GuiGraphicsExtractor graphics, int mouseX, int mouseY, float delta) {
+    public void render(GuiGraphics graphics, int mouseX, int mouseY, float delta) {
         RadialConfig config = RadialConfig.INSTANCE;
         RadialConfig.ActivationMode mode = config.activationMode;
         boolean isScrollMode =
                 mode == RadialConfig.ActivationMode.SCROLL_CLICK || mode == RadialConfig.ActivationMode.SCROLL_RELEASE;
 
         // 1. Check Key Release
-        InputConstants.Key boundKey = KeyMappingHelper.getBoundKeyOf(RadialClient.OPEN_RADIAL);
+        InputConstants.Key boundKey = RadialClient.OPEN_RADIAL.getKey();
         int keyCode = boundKey.getValue();
-        long handle = Minecraft.getInstance().getWindow().handle();
+        long handle = Minecraft.getInstance().getWindow().getWindow();
 
         boolean isReleased = true;
         if (boundKey.getType() == InputConstants.Type.MOUSE) {
@@ -259,38 +257,31 @@ public class RadialScreen extends Screen {
             float scale = revealEase
                     * (config.enableHoverAnimation ? 1.0F + SLOT_HOVER_SCALE * (i == hoveredSlot ? 1.0F : 0.0F) : 1.0F);
 
-            graphics.pose().pushMatrix();
-            graphics.pose().translate(slotX, slotY);
-            graphics.pose().scale(scale, scale);
+            graphics.pose().pushPose();
+            graphics.pose().translate(slotX, slotY, 0);
+            graphics.pose().scale(scale, scale, 1.0F);
 
-            int color = (revealAlpha << 24) | 0xFFFFFF;
             int drawOffset = -SLOT_SIZE / 2;
 
-            graphics.blitSprite(
-                    RenderPipelines.GUI_TEXTURED, SLOT_TEXTURE, drawOffset, drawOffset, SLOT_SIZE, SLOT_SIZE, color);
+            RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, revealAlpha / 255.0F);
+            graphics.blitSprite(SLOT_TEXTURE, drawOffset, drawOffset, SLOT_SIZE, SLOT_SIZE);
             if (i == hoveredSlot) {
-                graphics.blitSprite(
-                        RenderPipelines.GUI_TEXTURED,
-                        SELECTION_TEXTURE,
-                        drawOffset,
-                        drawOffset,
-                        SLOT_SIZE,
-                        SLOT_SIZE,
-                        color);
+                graphics.blitSprite(SELECTION_TEXTURE, drawOffset, drawOffset, SLOT_SIZE, SLOT_SIZE);
             }
+            RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
 
             if (isSubmenu() && i == 0) {
-                graphics.item(new ItemStack(Items.ARROW), -ITEM_SIZE / 2, -ITEM_SIZE / 2);
+                graphics.renderItem(new ItemStack(Items.ARROW), -ITEM_SIZE / 2, -ITEM_SIZE / 2);
             } else {
                 RadialSlot slot = getTargetSlot(i);
                 if (slot != null) {
                     SlotRenderHelper.renderSlotIcon(graphics, slot, drawOffset, drawOffset);
                 } else {
-                    graphics.item(new ItemStack(Items.BARRIER), -ITEM_SIZE / 2, -ITEM_SIZE / 2);
+                    graphics.renderItem(new ItemStack(Items.BARRIER), -ITEM_SIZE / 2, -ITEM_SIZE / 2);
                 }
             }
 
-            graphics.pose().popMatrix();
+            graphics.pose().popPose();
         }
 
         // 7. Render Center Label
@@ -303,12 +294,12 @@ public class RadialScreen extends Screen {
 
             if (!name.isEmpty()) {
                 int alpha = Mth.clamp((int) (easeOutQuint(getGlobalRevealProgress(config)) * 255.0F + 0.5F), 0, 255);
-                graphics.text(
+                graphics.drawString(
                         font, Component.nullToEmpty(name), cx - font.width(name) / 2, cy - 4, (alpha << 24) | 0xFFFFFF);
             }
         }
 
-        super.extractRenderState(graphics, mouseX, mouseY, delta);
+        super.render(graphics, mouseX, mouseY, delta);
     }
 
     // --- Math & Animations ---
@@ -416,9 +407,9 @@ public class RadialScreen extends Screen {
     }
 
     @Override
-    public boolean mouseClicked(@NonNull MouseButtonEvent click, boolean doubled) {
+    public boolean mouseClicked(double mouseX, double mouseY, int button) {
         if (hoveredSlot != -1) {
-            if (click.button() == 0) {
+            if (button == 0) {
                 if (isSubmenu() && hoveredSlot == 0) {
                     goBack();
                     return true;
@@ -429,31 +420,31 @@ public class RadialScreen extends Screen {
                     performAction(slot);
                     return true;
                 }
-            } else if (click.button() == 1) {
+            } else if (button == 1) {
                 if (isSubmenu() && hoveredSlot == 0) {
                     return true; // Right-clicking "Back" does nothing
                 }
 
                 RadialSlot slot = getTargetSlot(hoveredSlot);
                 if (slot != null) {
-                    minecraft.gui.setScreen(new SlotEditorScreen(slot, activeSlots == rootSlots));
+                    minecraft.setScreen(new SlotEditorScreen(slot, activeSlots == rootSlots));
                     return true;
                 }
             }
         }
 
-        if (click.button() == 0) {
+        if (button == 0) {
             onClose();
             return true;
         }
 
-        return super.mouseClicked(click, doubled);
+        return super.mouseClicked(mouseX, mouseY, button);
     }
 
     @Override
-    public boolean keyPressed(net.minecraft.client.input.@NonNull KeyEvent event) {
+    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
         // 1. Check if the "Back" key was pressed
-        if (RadialClient.BACK_KEY.matches(event)) {
+        if (RadialClient.BACK_KEY.matches(keyCode, scanCode)) {
             if (isSubmenu()) {
                 goBack();
                 return true;
@@ -462,7 +453,7 @@ public class RadialScreen extends Screen {
 
         // 2. Check if any of the Slot 1-12 keys were pressed
         for (int i = 0; i < RadialClient.SLOT_KEYS.length; i++) {
-            if (RadialClient.SLOT_KEYS[i].matches(event)) {
+            if (RadialClient.SLOT_KEYS[i].matches(keyCode, scanCode)) {
                 if (i < currentSlotCount && i < activeSlots.size()) {
                     performAction(activeSlots.get(i));
                     return true;
@@ -471,11 +462,11 @@ public class RadialScreen extends Screen {
         }
 
         // Pass any other keys (like ESC) to the default screen handler
-        return super.keyPressed(event);
+        return super.keyPressed(keyCode, scanCode, modifiers);
     }
 
     @Override
-    public void extractBackground(@NonNull GuiGraphicsExtractor graphics, int mouseX, int mouseY, float delta) {
+    public void renderBackground(GuiGraphics graphics, int mouseX, int mouseY, float delta) {
         // Intentionally left empty to prevent the default darkened screen background from rendering
     }
 }

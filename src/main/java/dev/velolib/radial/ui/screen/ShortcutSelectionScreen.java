@@ -7,14 +7,13 @@ import java.util.Map;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.AbstractSelectionList;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.EditBox;
-import net.minecraft.client.gui.components.ObjectSelectionList;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import org.jspecify.annotations.NonNull;
 
 public class ShortcutSelectionScreen extends Screen {
@@ -22,11 +21,11 @@ public class ShortcutSelectionScreen extends Screen {
     private static final int ENTRY_HEIGHT = 28;
 
     private final Screen parent;
-    private final Consumer<Identifier> onSelect;
+    private final Consumer<ResourceLocation> onSelect;
 
     private ShortcutList shortcutList;
 
-    public ShortcutSelectionScreen(Screen parent, Consumer<Identifier> onSelect) {
+    public ShortcutSelectionScreen(Screen parent, Consumer<ResourceLocation> onSelect) {
 
         super(Component.literal("Select Shortcut"));
 
@@ -72,7 +71,8 @@ public class ShortcutSelectionScreen extends Screen {
 
         shortcutList = new ShortcutList(Minecraft.getInstance(), listWidth, listHeight, listTop, ENTRY_HEIGHT);
 
-        shortcutList.updateSizeAndPosition(listWidth, listHeight, listLeft, listTop);
+        shortcutList.updateSizeAndPosition(listWidth, listHeight, listTop);
+        shortcutList.setX(listLeft);
 
         addRenderableWidget(shortcutList);
 
@@ -108,19 +108,19 @@ public class ShortcutSelectionScreen extends Screen {
     }
 
     @Override
-    public void extractRenderState(@NonNull GuiGraphicsExtractor graphics, int mouseX, int mouseY, float delta) {
+    public void render(GuiGraphics graphics, int mouseX, int mouseY, float delta) {
 
         graphics.fillGradient(0, 0, width, height, 0xC0101010, 0xD0101010);
 
-        super.extractRenderState(graphics, mouseX, mouseY, delta);
+        super.render(graphics, mouseX, mouseY, delta);
     }
 
     @Override
     public void onClose() {
-        minecraft.gui.setScreen(parent);
+        minecraft.setScreen(parent);
     }
 
-    private static class ShortcutList extends ObjectSelectionList<ShortcutEntryItem> {
+    private static class ShortcutList extends AbstractSelectionList<ShortcutEntryItem> {
 
         private ShortcutList(Minecraft minecraft, int width, int height, int y, int itemHeight) {
 
@@ -133,15 +133,17 @@ public class ShortcutSelectionScreen extends Screen {
         }
     }
 
-    private static class ShortcutEntryItem extends ObjectSelectionList.Entry<ShortcutEntryItem> {
+    private static class ShortcutEntryItem extends AbstractSelectionList.Entry<ShortcutEntryItem> {
 
-        private final Identifier id;
+        private final ResourceLocation id;
         private final ShortcutEntry entry;
-        private final Consumer<Identifier> onSelect;
+        private final Consumer<ResourceLocation> onSelect;
         private final Runnable onClose;
 
         private ShortcutEntryItem(
-                Map.Entry<Identifier, ShortcutEntry> mapEntry, Consumer<Identifier> onSelect, Runnable onClose) {
+                Map.Entry<ResourceLocation, ShortcutEntry> mapEntry,
+                Consumer<ResourceLocation> onSelect,
+                Runnable onClose) {
 
             this.id = mapEntry.getKey();
             this.entry = mapEntry.getValue();
@@ -150,15 +152,22 @@ public class ShortcutSelectionScreen extends Screen {
         }
 
         @Override
-        public void extractContent(
-                GuiGraphicsExtractor graphics, int mouseX, int mouseY, boolean hovered, float delta) {
+        public void render(
+                GuiGraphics graphics,
+                int index,
+                int top,
+                int left,
+                int width,
+                int height,
+                int mouseX,
+                int mouseY,
+                boolean hovered,
+                float delta) {
 
             Minecraft client = Minecraft.getInstance();
 
-            int left = getContentX();
-            int top = getContentY();
-            int right = getContentRight();
-            int bottom = getContentBottom();
+            int right = left + width;
+            int bottom = top + height;
 
             graphics.fill(left, top + 1, right, bottom - 1, hovered ? 0x80FFFFFF : 0x40000000);
 
@@ -166,19 +175,19 @@ public class ShortcutSelectionScreen extends Screen {
 
             String displayName = entry.name().getString();
 
-            graphics.text(client.font, displayName, left + 8, textY, 0xFFFFFFFF);
+            graphics.drawString(client.font, displayName, left + 8, textY, 0xFFFFFFFF);
 
             String idString = id.toString();
 
             int idWidth = client.font.width(idString);
 
-            graphics.text(client.font, idString, right - idWidth - 8, textY, 0xFFAAAAAA);
+            graphics.drawString(client.font, idString, right - idWidth - 8, textY, 0xFFAAAAAA);
         }
 
         @Override
-        public boolean mouseClicked(MouseButtonEvent event, boolean doubleClick) {
+        public boolean mouseClicked(double mouseX, double mouseY, int button) {
 
-            if (event.button() != 0) {
+            if (button != 0) {
                 return false;
             }
 

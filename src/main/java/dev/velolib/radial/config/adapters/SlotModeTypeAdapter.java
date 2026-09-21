@@ -5,7 +5,7 @@ import dev.velolib.radial.api.SlotMode;
 import dev.velolib.radial.api.SlotModeRegistry;
 import java.lang.reflect.Type;
 import java.util.Map;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 
 public class SlotModeTypeAdapter implements JsonSerializer<SlotMode>, JsonDeserializer<SlotMode> {
 
@@ -22,7 +22,7 @@ public class SlotModeTypeAdapter implements JsonSerializer<SlotMode>, JsonDeseri
         }
 
         // Parse the identifier safely
-        Identifier id = Identifier.tryParse(idString);
+        ResourceLocation id = ResourceLocation.tryParse(idString);
         if (id != null) {
             SlotMode mode = SlotModeRegistry.getRegisteredModes().get(id);
             if (mode != null) {
@@ -36,8 +36,8 @@ public class SlotModeTypeAdapter implements JsonSerializer<SlotMode>, JsonDeseri
 
     @Override
     public JsonElement serialize(SlotMode src, Type typeOfSrc, JsonSerializationContext context) {
-        // Reverse lookup: Find the Identifier for the given SlotMode instance
-        for (Map.Entry<Identifier, SlotMode> entry :
+        // Reverse lookup: Find the ResourceLocation for the given SlotMode instance
+        for (Map.Entry<ResourceLocation, SlotMode> entry :
                 SlotModeRegistry.getRegisteredModes().entrySet()) {
             // We check by class type to ensure we match the right mode safely
             if (entry.getValue().getClass() == src.getClass()) {

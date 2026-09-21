@@ -30,10 +30,8 @@ neoForge {
     }
 }
 
-// Mixin refmap for the KeyMapping mixins
-mixin {
-    add(sourceSets.main, 'radial.refmap.json')
-}
+// Mixin refmaps are generated automatically by ModDevGradle
+// for the configs listed in neoforge.mods.toml.
 
 repositories {
     mavenCentral()

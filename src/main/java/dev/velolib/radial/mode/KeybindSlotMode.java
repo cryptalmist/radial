@@ -74,7 +74,7 @@ public class KeybindSlotMode extends IconEnabledSlotMode {
 
         Button valueBrowseButton = Button.builder(
                         Component.translatable("screen.radial.editor.select"),
-                        _ -> Minecraft.getInstance().setScreen(new KeybindPickerScreen(screen, id -> {
+                        btn -> Minecraft.getInstance().setScreen(new KeybindPickerScreen(screen, id -> {
                             valueField.setValue(id);
                             slot.value = id;
                         })))

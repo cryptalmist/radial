@@ -40,7 +40,7 @@ public class IconPickerScreen extends Screen {
         int xOffset = (width - tabWidth * tabs.size()) / 2;
 
         for (IconTab tab : tabs) {
-            Button button = Button.builder(tab.getTitle(), _ -> setTab(tab))
+            Button button = Button.builder(tab.getTitle(), btn -> setTab(tab))
                     .bounds(xOffset, 10, tabWidth, 20)
                     .build();
 
@@ -63,7 +63,7 @@ public class IconPickerScreen extends Screen {
         });
 
         addRenderableWidget(searchField);
-        addRenderableWidget(Button.builder(Component.translatable("gui.cancel"), _ -> onClose())
+        addRenderableWidget(Button.builder(Component.translatable("gui.cancel"), btn -> onClose())
                 .bounds(width / 2 - 100, height - 28, 200, 20)
                 .build());
 

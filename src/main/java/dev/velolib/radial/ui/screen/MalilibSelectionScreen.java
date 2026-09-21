@@ -75,7 +75,7 @@ public class MalilibSelectionScreen extends Screen {
         tabButtons.clear();
 
         if (actionsByMod.isEmpty()) {
-            addRenderableWidget(Button.builder(Component.translatable("gui.cancel"), _ -> onClose())
+            addRenderableWidget(Button.builder(Component.translatable("gui.cancel"), btn -> onClose())
                     .bounds(width / 2 - 100, height - 28, 200, 20)
                     .build());
 
@@ -87,7 +87,7 @@ public class MalilibSelectionScreen extends Screen {
         int xOffset = (width - tabWidth * actionsByMod.size()) / 2;
 
         for (String modName : actionsByMod.keySet()) {
-            Button button = Button.builder(Component.literal(modName), _ -> {
+            Button button = Button.builder(Component.literal(modName), btn -> {
                         setTab(modName);
                         updateTabButtonStates();
                     })
@@ -126,7 +126,7 @@ public class MalilibSelectionScreen extends Screen {
 
         addRenderableWidget(malilibList);
 
-        addRenderableWidget(Button.builder(Component.translatable("gui.cancel"), _ -> onClose())
+        addRenderableWidget(Button.builder(Component.translatable("gui.cancel"), btn -> onClose())
                 .bounds(width / 2 - 100, height - 28, 200, 20)
                 .build());
 

@@ -55,7 +55,7 @@ public abstract class IconEnabledSlotMode implements SlotMode {
         // Browse Button
         Button browseIconButton = Button.builder(
                         Component.translatable("screen.radial.editor.browse"),
-                        _ -> Minecraft.getInstance().setScreen(new IconPickerScreen(screen, id -> {
+                        btn -> Minecraft.getInstance().setScreen(new IconPickerScreen(screen, id -> {
                             iconField.setValue(id);
                             slot.itemId = id;
                             slot.clearCache();
@@ -65,7 +65,7 @@ public abstract class IconEnabledSlotMode implements SlotMode {
         inputRow.addChild(browseIconButton);
 
         // Hand Button
-        Button handButton = Button.builder(Component.translatable("screen.radial.editor.hand"), _ -> {
+        Button handButton = Button.builder(Component.translatable("screen.radial.editor.hand"), btn -> {
                     if (Minecraft.getInstance().player != null) {
                         ItemStack stack = Minecraft.getInstance().player.getMainHandItem();
                         String id = !stack.isEmpty()

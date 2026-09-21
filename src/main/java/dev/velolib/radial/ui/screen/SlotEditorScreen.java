@@ -124,7 +124,7 @@ public class SlotEditorScreen extends Screen {
         LinearLayout actionGroup = LinearLayout.horizontal().spacing(HORIZ_GAP);
         int actionBtnWidth = (contentWidth - HORIZ_GAP) / 2;
 
-        Button saveButton = Button.builder(Component.translatable("screen.radial.editor.save"), _ -> {
+        Button saveButton = Button.builder(Component.translatable("screen.radial.editor.save"), btn -> {
                     this.isSaved = true;
                     RadialConfig.save();
                     onClose();
@@ -133,7 +133,7 @@ public class SlotEditorScreen extends Screen {
                 .build();
         actionGroup.addChild(saveButton);
 
-        Button cancelButton = Button.builder(Component.translatable("screen.radial.editor.cancel"), _ -> onClose())
+        Button cancelButton = Button.builder(Component.translatable("screen.radial.editor.cancel"), btn -> onClose())
                 .bounds(0, 0, actionBtnWidth, ROW_HEIGHT)
                 .build();
         actionGroup.addChild(cancelButton);

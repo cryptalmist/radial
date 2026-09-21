@@ -72,7 +72,7 @@ public class KeybindPickerScreen extends Screen {
 
         addRenderableWidget(keybindList);
 
-        addRenderableWidget(Button.builder(Component.translatable("gui.cancel"), _ -> onClose())
+        addRenderableWidget(Button.builder(Component.translatable("gui.cancel"), btn -> onClose())
                 .bounds(width / 2 - 100, height - 28, 200, 20)
                 .build());
 

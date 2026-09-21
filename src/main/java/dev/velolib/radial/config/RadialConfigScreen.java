@@ -48,7 +48,7 @@ public class RadialConfigScreen {
                                 .build())
                         .option(Option.<Boolean>createBuilder()
                                 .name(Component.empty())
-                                .binding(false, () -> false, _ -> {})
+                                .binding(false, () -> false, v -> {})
                                 .customController(opt -> createPreviewController(opt, config))
                                 .build())
 
@@ -266,7 +266,7 @@ public class RadialConfigScreen {
                         .name(Component.translatable("screen.radial.config.category.preview"))
                         .option(Option.<Boolean>createBuilder()
                                 .name(Component.empty())
-                                .binding(false, () -> false, _ -> {})
+                                .binding(false, () -> false, v -> {})
                                 .customController(opt -> createPreviewController(opt, config))
                                 .build())
                         .build())

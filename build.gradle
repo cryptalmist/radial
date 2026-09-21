@@ -52,8 +52,8 @@ repositories {
 dependencies {
     // Optional at runtime: config screen (YACL) and MaLiLib hotkey slots (MaFgLib).
     // compileOnly + runtimeOnly = available while developing, never bundled or required.
-    compileOnly "maven.modrinth:yet_another_config_lib_v3:${project.yacl_version}"
-    runtimeOnly "maven.modrinth:yet_another_config_lib_v3:${project.yacl_version}"
+    compileOnly "maven.modrinth:yacl:${project.yacl_version}"
+    runtimeOnly "maven.modrinth:yacl:${project.yacl_version}"
 
     compileOnly "maven.modrinth:mafglib:${project.mafglib_version}"
     runtimeOnly "maven.modrinth:mafglib:${project.mafglib_version}"

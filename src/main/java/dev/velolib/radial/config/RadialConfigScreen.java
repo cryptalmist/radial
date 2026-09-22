@@ -50,7 +50,8 @@ public class RadialConfigScreen {
                                 .build())
                         .option(ButtonOption.createBuilder()
                                 .name(Text.translatable("screen.radial.config.optimize"))
-                                .description(OptionDescription.of(Text.translatable("screen.radial.config.optimize.tooltip")))
+                                .description(OptionDescription.of(
+                                        Text.translatable("screen.radial.config.optimize.tooltip")))
                                 .action((screen, opt) -> {
                                     optimizeSlotTree(config.slots);
                                     RadialConfig.save();

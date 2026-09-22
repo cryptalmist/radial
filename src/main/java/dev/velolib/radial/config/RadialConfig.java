@@ -55,6 +55,7 @@ public class RadialConfig {
     public ActivationMode activationMode = ActivationMode.CLICK;
     public boolean enableHoverAnimation = true;
     public boolean showActivationZone = true;
+    public boolean resetCursorOnSubmenu = false;
 
     public float sectorGap = 3.0f;
     public boolean drawSectorBorders = true;
@@ -65,6 +66,7 @@ public class RadialConfig {
     public Color activationColor = new Color(0x66FFE7B0, true);
     public Color borderColor = new Color(0x99FFE7B0, true);
     public Color highlightBorderColor = new Color(0x99FFE7B0, true);
+    public boolean enableBackgroundBlur = false;
 
     public List<RadialSlot> slots = new ArrayList<>();
 

@@ -78,6 +78,8 @@
   "screen.radial.config.sector_border_width.tooltip": "控制分隔扇区的直边边框的粗细。",
   "screen.radial.config.sector_gap": "扇区间隔",
   "screen.radial.config.sector_gap.tooltip": "每个扇区之间的视觉间距。这纯粹是装饰性的，不影响可点击的判定区域。",
+  "screen.radial.config.enable_background_blur": "启用背景模糊",
+  "screen.radial.config.enable_background_blur.tooltip": "打开径向菜单时平滑模糊背景，与展开动画同步。",
   "screen.radial.config.group.behavior": "交互与行为",
   "screen.radial.config.reveal_animation": "展开动画",
   "screen.radial.config.reveal_animation.tooltip": "控制径向菜单打开时的显示方式。",
@@ -96,5 +98,9 @@
   "screen.radial.config.reveal_animation.zoom": "缩放",
   "screen.radial.config.reveal_animation.staggered_clockwise": "交错 — 顺时针",
   "screen.radial.config.reveal_animation.staggered_counterclockwise": "交错 — 逆时针",
-  "screen.radial.config.reveal_animation.staggered_both": "交错 — 双向"
+  "screen.radial.config.reveal_animation.staggered_both": "交错 — 双向",
+  "screen.radial.config.optimize": "优化 Radial 配置",
+  "screen.radial.config.optimize.tooltip": "当你将“子菜单”槽位切换为其他模式时，其嵌套槽位仍会在后台保留。\n\n此按钮将永久删除所有隐藏的、未使用的子菜单数据，以优化内存并减小配置文件体积。\n\n警告：此操作不可逆。这是彻底重置并清除槽位子菜单数据的唯一方法。",
+  "screen.radial.config.reset_cursor_on_submenu": "子菜单重置光标",
+  "screen.radial.config.reset_cursor_on_submenu.tooltip": "打开子菜单时是否将光标位置重置到屏幕中心。"
 }

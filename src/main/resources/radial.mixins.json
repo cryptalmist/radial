@@ -11,6 +11,7 @@
   "client": [
     "CrosshairMixin",
     "KeyMappingAccessor",
-    "KeyMappingMixin"
+    "KeyMappingMixin",
+    "OptionsMixin"
   ]
 }

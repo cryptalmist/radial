@@ -103,6 +103,9 @@
   "screen.radial.config.sector_gap": "Sector Gap",
   "screen.radial.config.sector_gap.tooltip": "The visual spacing between each slice. This is purely cosmetic and does not affect the clickable hitbox area.",
 
+  "screen.radial.config.enable_background_blur": "Enable Background Blur",
+  "screen.radial.config.enable_background_blur.tooltip": "Smoothly blurs the background when opening the radial menu, matching the reveal animation.",
+
   "screen.radial.config.group.behavior": "Interaction & Behavior",
 
   "screen.radial.config.reveal_animation": "Reveal Animation",
@@ -128,5 +131,11 @@
   "screen.radial.config.reveal_animation.zoom": "Zoom",
   "screen.radial.config.reveal_animation.staggered_clockwise": "Staggered — Clockwise",
   "screen.radial.config.reveal_animation.staggered_counterclockwise": "Staggered — Counterclockwise",
-  "screen.radial.config.reveal_animation.staggered_both": "Staggered — Both Directions"
+  "screen.radial.config.reveal_animation.staggered_both": "Staggered — Both Directions",
+
+  "screen.radial.config.optimize": "Optimize Radial Config",
+  "screen.radial.config.optimize.tooltip": "When you change a 'Submenu' slot to another mode, its nested slots are kept saved in the background.\n\nThis button permanently deletes all of that hidden, unused submenu data to optimize memory and shrink your config file size.\n\nWARNING: This action is irreversible. This is the only way to completely reset and clear submenu data for a slot.",
+
+  "screen.radial.config.reset_cursor_on_submenu": "Reset Cursor on Submenu",
+  "screen.radial.config.reset_cursor_on_submenu.tooltip": "Whether to reset the position of the cursor to the center of the screen when opening a submenu."
 }

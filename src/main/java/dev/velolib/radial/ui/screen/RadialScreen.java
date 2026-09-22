@@ -9,6 +9,8 @@ import dev.velolib.radial.render.SlotRenderHelper;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
+import java.util.Stack;
+
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.minecraft.client.gl.RenderPipelines;
 import net.minecraft.client.gui.Click;
@@ -38,6 +40,9 @@ public class RadialScreen extends Screen {
     private static final int MAX_RENDER_SLOTS = 13;
 
     private static final DonutRenderer SECTOR_RENDERER = new DonutRenderer("main");
+
+    private record MenuState(List<RadialSlot> slots, int slotCount) {}
+    private final Stack<MenuState> history = new Stack<>();
 
     private final List<RadialSlot> rootSlots;
     private final float[] pushAnim;
@@ -94,7 +99,7 @@ public class RadialScreen extends Screen {
     // --- State Helpers ---
 
     private boolean isSubmenu() {
-        return activeSlots != rootSlots;
+        return !history.isEmpty();
     }
 
     private int getRenderCount() {
@@ -339,18 +344,28 @@ public class RadialScreen extends Screen {
                 1.0F);
     }
 
-    private float getGlobalRevealProgress(RadialConfig config) {
+    public float getGlobalRevealProgress(RadialConfig config) {
         if (config.revealDurationMs <= 0) return 1.0F;
         return MathHelper.clamp((float) (revealElapsedSeconds / (config.revealDurationMs / 1000.0F)), 0.0F, 1.0F);
     }
 
-    private float easeOutQuint(float value) {
+    public float easeOutQuint(float value) {
         value = MathHelper.clamp(value, 0.0F, 1.0F);
         float inverse = 1.0F - value;
         return 1.0F - inverse * inverse * inverse * inverse * inverse;
     }
 
     // --- Input & Actions ---
+
+    private void resetCursorPosition() {
+        RadialConfig.ActivationMode mode = RadialConfig.INSTANCE.activationMode;
+        if (mode == RadialConfig.ActivationMode.CLICK || mode == RadialConfig.ActivationMode.RELEASE) {
+            long windowHandle = client.getWindow().getHandle();
+            double centerX = client.getWindow().getFramebufferWidth() / 2.0;
+            double centerY = client.getWindow().getFramebufferHeight() / 2.0;
+            GLFW.glfwSetCursorPos(windowHandle, centerX, centerY);
+        }
+    }
 
     private void performAction(RadialSlot slot) {
         slot.mode.performAction(slot, new SlotActionContext() {
@@ -362,11 +377,19 @@ public class RadialScreen extends Screen {
 
             @Override
             public void openSubmenu(List<RadialSlot> children, int slotCount) {
-                if (activeSlots == rootSlots) {
-                    activeSlots = children;
-                    currentSlotCount = slotCount;
-                    resetAnims();
-                    prepareSectorRenderer();
+                // Hard limit the submenu depth
+                if (history.size() >= 5) {
+                    return;
+                }
+
+                history.push(new MenuState(activeSlots, currentSlotCount));
+
+                activeSlots = children;
+                currentSlotCount = slotCount;
+                resetAnims();
+                prepareSectorRenderer();
+                if (RadialConfig.INSTANCE.resetCursorOnSubmenu) {
+                    resetCursorPosition();
                 }
             }
 
@@ -378,10 +401,21 @@ public class RadialScreen extends Screen {
     }
 
     private void goBack() {
-        activeSlots = rootSlots;
-        currentSlotCount = RadialConfig.INSTANCE.slotCount;
+        if (!history.isEmpty()) {
+            MenuState previous = history.pop();
+            activeSlots = previous.slots;
+            currentSlotCount = previous.slotCount;
+        } else {
+            // Fallback just in case, though it shouldn't be reached if the back button is hidden on root
+            activeSlots = rootSlots;
+            currentSlotCount = RadialConfig.INSTANCE.slotCount;
+        }
+
         resetAnims();
         prepareSectorRenderer();
+        if (RadialConfig.INSTANCE.resetCursorOnSubmenu) {
+            resetCursorPosition();
+        }
     }
 
     private void resetAnims() {
@@ -432,7 +466,7 @@ public class RadialScreen extends Screen {
 
                 RadialSlot slot = getTargetSlot(hoveredSlot);
                 if (slot != null) {
-                    client.setScreen(new SlotEditorScreen(slot, activeSlots == rootSlots));
+                    client.setScreen(new SlotEditorScreen(slot));
                     return true;
                 }
             }
@@ -472,6 +506,12 @@ public class RadialScreen extends Screen {
 
     @Override
     public void renderBackground(DrawContext graphics, int mouseX, int mouseY, float delta) {
-        // Intentionally left empty to prevent the default darkened screen background from rendering
+        // Intentionally skip super.renderBackground to remove the dark gradient
+
+        if (RadialConfig.INSTANCE.enableBackgroundBlur) {
+            // Yarn 1.21.11: DrawContext.applyBlur() renders blur without dark gradient.
+            // Animated via OptionsMixin overriding getMenuBackgroundBlurrinessValue().
+            graphics.applyBlur();
+        }
     }
 }

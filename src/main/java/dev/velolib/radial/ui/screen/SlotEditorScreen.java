@@ -30,12 +30,12 @@ public class SlotEditorScreen extends Screen {
     private static final int HORIZ_GAP = 5;
 
     private final RadialSlot slot;
-    private final boolean isRoot;
 
     // State for reverting changes on cancel
     private final String oldName, oldValue, oldId;
     private final SlotMode oldMode;
     private final int oldChildCount;
+    private final List<RadialSlot> oldChildren;
 
     private boolean isSaved = false;
 
@@ -43,16 +43,16 @@ public class SlotEditorScreen extends Screen {
     private TextFieldWidget nameField;
     private DropdownButtonWidget<SlotMode> modeDropdown;
 
-    public SlotEditorScreen(RadialSlot slot, boolean isRoot) {
+    public SlotEditorScreen(RadialSlot slot) {
         super(Text.translatable("screen.radial.editor.title"));
         this.slot = slot;
-        this.isRoot = isRoot;
 
         this.oldName = slot.name;
         this.oldValue = slot.value;
         this.oldId = slot.itemId;
         this.oldMode = slot.mode;
         this.oldChildCount = slot.childSlotCount;
+        this.oldChildren = slot.children != null ? new java.util.ArrayList<>(slot.children) : null;
     }
 
     @Override
@@ -81,12 +81,7 @@ public class SlotEditorScreen extends Screen {
         modeGroup.add(modeLabel);
 
         List<SlotMode> availableModes = SlotModeRegistry.getRegisteredModes().values().stream()
-                .filter(mode -> mode.isAvailable()
-                        && (isRoot
-                                || !mode.getTranslatedName()
-                                        .getString()
-                                        .toLowerCase()
-                                        .contains("submenu")))
+                .filter(SlotMode::isAvailable)
                 .toList();
 
         modeDropdown =
@@ -191,6 +186,13 @@ public class SlotEditorScreen extends Screen {
             slot.itemId = oldId;
             slot.mode = oldMode;
             slot.childSlotCount = oldChildCount;
+
+            if (oldChildren != null) {
+                slot.children = new java.util.ArrayList<>(oldChildren);
+            } else {
+                slot.children = null;
+            }
+
             slot.clearCache();
         }
 

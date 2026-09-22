@@ -5,8 +5,11 @@ import dev.isxander.yacl3.api.controller.*;
 import dev.isxander.yacl3.api.utils.Dimension;
 import dev.isxander.yacl3.gui.AbstractWidget;
 import dev.isxander.yacl3.gui.YACLScreen;
+import dev.velolib.radial.api.RadialSlot;
+import dev.velolib.radial.mode.SubmenuSlotMode;
 import dev.velolib.radial.render.DonutRenderer;
 import java.awt.*;
+import java.util.List;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gl.RenderPipelines;
 import net.minecraft.client.gui.DrawContext;
@@ -44,6 +47,14 @@ public class RadialConfigScreen {
                                         Text.translatable("screen.radial.config.show_preview.tooltip")))
                                 .binding(true, () -> showPreview, v -> showPreview = v)
                                 .controller(BooleanControllerBuilder::create)
+                                .build())
+                        .option(ButtonOption.createBuilder()
+                                .name(Text.translatable("screen.radial.config.optimize"))
+                                .description(OptionDescription.of(Text.translatable("screen.radial.config.optimize.tooltip")))
+                                .action((screen, opt) -> {
+                                    optimizeSlotTree(config.slots);
+                                    RadialConfig.save();
+                                })
                                 .build())
                         .option(Option.<Boolean>createBuilder()
                                 .name(Text.empty())
@@ -198,6 +209,16 @@ public class RadialConfigScreen {
                                                 .range(0.0f, 20.0f)
                                                 .step(0.5f))
                                         .build())
+                                .option(Option.<Boolean>createBuilder()
+                                        .name(Text.translatable("screen.radial.config.enable_background_blur"))
+                                        .description(OptionDescription.of(Text.translatable(
+                                                "screen.radial.config.enable_background_blur.tooltip")))
+                                        .binding(
+                                                false,
+                                                () -> config.enableBackgroundBlur,
+                                                v -> config.enableBackgroundBlur = v)
+                                        .controller(BooleanControllerBuilder::create)
+                                        .build())
                                 .build())
 
                         // BEHAVIOR
@@ -256,6 +277,16 @@ public class RadialConfigScreen {
                                         .controller(opt -> EnumControllerBuilder.create(opt)
                                                 .enumClass(RadialConfig.ActivationMode.class))
                                         .build())
+                                .option(Option.<Boolean>createBuilder()
+                                        .name(Text.translatable("screen.radial.config.reset_cursor_on_submenu"))
+                                        .description(OptionDescription.of(Text.translatable(
+                                                "screen.radial.config.reset_cursor_on_submenu.tooltip")))
+                                        .binding(
+                                                false,
+                                                () -> RadialConfig.INSTANCE.resetCursorOnSubmenu,
+                                                v -> RadialConfig.INSTANCE.resetCursorOnSubmenu = v)
+                                        .controller(BooleanControllerBuilder::create)
+                                        .build())
                                 .build())
                         .build())
 
@@ -271,6 +302,21 @@ public class RadialConfigScreen {
                 .save(RadialConfig::save)
                 .build()
                 .generateScreen(parent);
+    }
+
+    private static void optimizeSlotTree(List<RadialSlot> slots) {
+        if (slots == null || slots.isEmpty()) return;
+
+        for (RadialSlot slot : slots) {
+            if (!(slot.mode instanceof SubmenuSlotMode)) {
+                if (slot.children != null) {
+                    slot.children.clear();
+                }
+                slot.childSlotCount = 0;
+            } else {
+                optimizeSlotTree(slot.children);
+            }
+        }
     }
 
     private static Controller<Boolean> createPreviewController(Option<Boolean> opt, RadialConfig config) {

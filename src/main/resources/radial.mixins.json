@@ -2,7 +2,7 @@
   "required": true,
   "package": "dev.velolib.radial.mixin",
   "compatibilityLevel": "JAVA_21",
-  "refmap": "radial.refmap.json",
+  "minVersion": "0.8",
   "injectors": {
     "defaultRequire": 1
   },

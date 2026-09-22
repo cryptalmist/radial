@@ -10,6 +10,7 @@ import net.minecraft.client.gui.components.ContainerObjectSelectionList;
 import net.minecraft.client.gui.components.Renderable;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
+import net.minecraft.client.gui.narration.NarratableEntry;
 import net.minecraft.network.chat.Component;
 
 public abstract class GridIconTab<T> implements IconTab {
@@ -103,7 +104,7 @@ public abstract class GridIconTab<T> implements IconTab {
         }
 
         @Override
-        protected void updateWidgetNarration(NarrationElementOutput narrationElementOutput) {}
+        public void updateWidgetNarration(NarrationElementOutput narrationElementOutput) {}
 
         @Override
         public int getRowWidth() {
@@ -184,6 +185,10 @@ public abstract class GridIconTab<T> implements IconTab {
 
         public Component getNarration() {
             return items.isEmpty() ? Component.literal("Empty row") : getItemNarration(items.getFirst());
+        }
+
+        public List<? extends NarratableEntry> narratables() {
+            return List.of();
         }
     }
 }

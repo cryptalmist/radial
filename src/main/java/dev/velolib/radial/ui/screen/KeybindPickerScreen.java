@@ -13,6 +13,7 @@ import net.minecraft.client.gui.components.ContainerObjectSelectionList;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
+import net.minecraft.client.gui.narration.NarratableEntry;
 import net.minecraft.network.chat.Component;
 
 public class KeybindPickerScreen extends Screen {
@@ -137,7 +138,7 @@ public class KeybindPickerScreen extends Screen {
         }
 
         @Override
-        protected void updateWidgetNarration(NarrationElementOutput narrationElementOutput) {}
+        public void updateWidgetNarration(NarrationElementOutput narrationElementOutput) {}
 
         @Override
         public int getRowWidth() {
@@ -210,6 +211,10 @@ public class KeybindPickerScreen extends Screen {
 
         public Component getNarration() {
             return Component.translatable(key.getName());
+        }
+
+        public List<? extends NarratableEntry> narratables() {
+            return List.of();
         }
     }
 }

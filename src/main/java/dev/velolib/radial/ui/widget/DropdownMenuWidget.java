@@ -2,6 +2,7 @@ package dev.velolib.radial.ui.widget;
 
 import java.util.List;
 import java.util.function.Function;
+import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
@@ -90,6 +91,11 @@ public class DropdownMenuWidget<T> extends AbstractWidget {
     protected void renderWidget(GuiGraphics graphics, int mouseX, int mouseY, float delta) {
         Minecraft mc = Minecraft.getInstance();
         Font font = mc.font;
+
+        // Opaque fallback background: guarantees the menu occludes the form
+        // beneath it even if the sprite below fails to cover on some versions.
+        RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
+        graphics.fill(getX(), getY(), getX() + width, getY() + height, 0xFF000000);
 
         graphics.blitSprite(SPRITE_HIGHLIGHTED, getX(), getY(), width, height);
 

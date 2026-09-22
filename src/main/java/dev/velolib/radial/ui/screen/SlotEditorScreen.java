@@ -142,8 +142,9 @@ public class SlotEditorScreen extends Screen {
         // --- FINAL ASSEMBLY ---
         mainLayout.refreshPositions();
 
-        // Offset the Y position down by 20 to ensure room at the top of the screen for the icon
-        SimplePositioningWidget.setPos(mainLayout, 0, 20, width, height, 0.5f, 0.0f);
+        // Center in (0, 20, width, height) to match upstream FrameLayout.centerInRectangle:
+        // leaves 20px top room for the icon, form vertically centered (not top-pinned).
+        SimplePositioningWidget.setPos(mainLayout, 0, 20, width, height, 0.5f, 0.5f);
         mainLayout.forEachChild(this::addDrawableChild);
     }
 

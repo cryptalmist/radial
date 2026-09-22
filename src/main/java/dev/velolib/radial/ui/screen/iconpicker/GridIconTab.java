@@ -190,5 +190,9 @@ public abstract class GridIconTab<T> implements IconTab {
         public List<? extends NarratableEntry> narratables() {
             return List.of();
         }
+
+        public List<? extends GuiEventListener> children() {
+            return List.of();
+        }
     }
 }

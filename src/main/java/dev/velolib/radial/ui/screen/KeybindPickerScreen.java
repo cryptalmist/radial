@@ -11,6 +11,7 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.ContainerObjectSelectionList;
 import net.minecraft.client.gui.components.EditBox;
+import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.gui.narration.NarratableEntry;
@@ -214,6 +215,10 @@ public class KeybindPickerScreen extends Screen {
         }
 
         public List<? extends NarratableEntry> narratables() {
+            return List.of();
+        }
+
+        public List<? extends GuiEventListener> children() {
             return List.of();
         }
     }

@@ -12,10 +12,9 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
-import net.neoforged.bus.api.IEventBus;
+import net.minecraft.SharedConstants;
 import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.ModList;
-import net.neoforged.fml.loading.FMLEnvironment;
 import net.neoforged.neoforge.client.event.ClientTickEvent;
 import net.neoforged.neoforge.client.event.RegisterKeyMappingsEvent;
 import net.neoforged.neoforge.client.event.RenderGuiLayerEvent;
@@ -75,7 +74,7 @@ public class RadialClient {
     }
 
     public static void devLogger(String message) {
-        if (FMLEnvironment.development) {
+        if (SharedConstants.IS_RUNNING_IN_IDE) {
             LOGGER.info("DEV - [ {} ]", message);
         }
     }

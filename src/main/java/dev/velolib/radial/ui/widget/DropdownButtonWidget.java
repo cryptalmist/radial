@@ -10,7 +10,6 @@ import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
-import org.jspecify.annotations.NonNull;
 
 public class DropdownButtonWidget<T> extends AbstractWidget {
     private static final ResourceLocation SPRITE = ResourceLocation.fromNamespaceAndPath("minecraft", "widget/text_field");
@@ -113,7 +112,7 @@ public class DropdownButtonWidget<T> extends AbstractWidget {
     }
 
     @Override
-    protected void updateWidgetNarration(@NonNull NarrationElementOutput narrationElementOutput) {
+    protected void updateWidgetNarration(NarrationElementOutput narrationElementOutput) {
         this.defaultButtonNarrationText(narrationElementOutput);
     }
 }

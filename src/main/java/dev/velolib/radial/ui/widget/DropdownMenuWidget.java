@@ -10,7 +10,6 @@ import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
-import org.jspecify.annotations.NonNull;
 
 public class DropdownMenuWidget<T> extends AbstractWidget {
     private static final int MAX_VISIBLE_ITEMS = 6;
@@ -134,5 +133,5 @@ public class DropdownMenuWidget<T> extends AbstractWidget {
     }
 
     @Override
-    protected void updateWidgetNarration(@NonNull NarrationElementOutput narrationElementOutput) {}
+    protected void updateWidgetNarration(NarrationElementOutput narrationElementOutput) {}
 }

@@ -1,18 +1,19 @@
 package dev.velolib.radial.ui.screen;
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.components.AbstractSelectionList;
 import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.components.ContainerObjectSelectionList;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.network.chat.Component;
-import org.jspecify.annotations.NonNull;
 
 public class KeybindPickerScreen extends Screen {
 
@@ -107,7 +108,7 @@ public class KeybindPickerScreen extends Screen {
                 .map(key -> new KeybindEntry(key, onSelect, this::onClose))
                 .collect(Collectors.toList());
 
-        keybindList.replaceEntries(entries);
+        keybindList.setEntries(entries);
         keybindList.setScrollAmount(0.0);
     }
 
@@ -124,12 +125,19 @@ public class KeybindPickerScreen extends Screen {
         minecraft.setScreen(parent);
     }
 
-    private static class KeybindList extends AbstractSelectionList<KeybindEntry> {
+    private static class KeybindList extends ContainerObjectSelectionList<KeybindEntry> {
 
         private KeybindList(Minecraft minecraft, int width, int height, int y, int itemHeight) {
 
             super(minecraft, width, height, y, itemHeight);
         }
+
+        public void setEntries(Collection<KeybindEntry> entries) {
+            replaceEntries(entries);
+        }
+
+        @Override
+        protected void updateWidgetNarration(NarrationElementOutput narrationElementOutput) {}
 
         @Override
         public int getRowWidth() {
@@ -137,7 +145,7 @@ public class KeybindPickerScreen extends Screen {
         }
     }
 
-    private static class KeybindEntry extends AbstractSelectionList.Entry<KeybindEntry> {
+    private static class KeybindEntry extends ContainerObjectSelectionList.Entry<KeybindEntry> {
 
         private final KeyMapping key;
         private final Consumer<String> onSelect;
@@ -200,8 +208,7 @@ public class KeybindPickerScreen extends Screen {
             return true;
         }
 
-        @Override
-        public @NonNull Component getNarration() {
+        public Component getNarration() {
             return Component.translatable(key.getName());
         }
     }

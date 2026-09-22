@@ -82,7 +82,7 @@ public class ItemIconTab extends GridIconTab<ItemIconTab.ItemSearchEntry> {
 
     @Override
     protected Component getItemNarration(ItemSearchEntry item) {
-        return item.stack().getItemName();
+        return item.stack().getHoverName();
     }
 
     private static void ensureItemIndex() {
@@ -93,7 +93,7 @@ public class ItemIconTab extends GridIconTab<ItemIconTab.ItemSearchEntry> {
         for (Item item : BuiltInRegistries.ITEM) {
             ResourceLocation id = BuiltInRegistries.ITEM.getKey(item);
             ItemStack stack = item.getDefaultInstance();
-            String name = stack.getItemName().getString();
+            String name = stack.getHoverName().getString();
 
             index.add(new ItemSearchEntry(item, stack, id, name, (id + " " + name).toLowerCase()));
         }

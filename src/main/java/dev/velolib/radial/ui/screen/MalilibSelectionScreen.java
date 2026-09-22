@@ -3,6 +3,7 @@ package dev.velolib.radial.ui.screen;
 import dev.velolib.radial.integration.MalilibIntegration;
 import dev.velolib.radial.integration.MalilibIntegration.MalilibAction;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -10,12 +11,12 @@ import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.components.AbstractSelectionList;
 import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.components.ContainerObjectSelectionList;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.network.chat.Component;
-import org.jspecify.annotations.NonNull;
 
 public class MalilibSelectionScreen extends Screen {
 
@@ -160,7 +161,7 @@ public class MalilibSelectionScreen extends Screen {
                 .map(action -> new MalilibEntry(action, onSelect, this::onClose))
                 .collect(Collectors.toList());
 
-        malilibList.replaceEntries(entries);
+        malilibList.setEntries(entries);
         malilibList.setScrollAmount(0.0);
     }
 
@@ -192,12 +193,19 @@ public class MalilibSelectionScreen extends Screen {
         minecraft.setScreen(parent);
     }
 
-    private static class MalilibList extends AbstractSelectionList<MalilibEntry> {
+    private static class MalilibList extends ContainerObjectSelectionList<MalilibEntry> {
 
         private MalilibList(Minecraft minecraft, int width, int height, int y, int itemHeight) {
 
             super(minecraft, width, height, y, itemHeight);
         }
+
+        public void setEntries(Collection<MalilibEntry> entries) {
+            replaceEntries(entries);
+        }
+
+        @Override
+        protected void updateWidgetNarration(NarrationElementOutput narrationElementOutput) {}
 
         @Override
         public int getRowWidth() {
@@ -205,7 +213,7 @@ public class MalilibSelectionScreen extends Screen {
         }
     }
 
-    private static class MalilibEntry extends AbstractSelectionList.Entry<MalilibEntry> {
+    private static class MalilibEntry extends ContainerObjectSelectionList.Entry<MalilibEntry> {
 
         private final MalilibAction action;
         private final Consumer<MalilibAction> onSelect;
@@ -262,8 +270,7 @@ public class MalilibSelectionScreen extends Screen {
             return true;
         }
 
-        @Override
-        public @NonNull Component getNarration() {
+        public Component getNarration() {
             return Component.literal(action.displayName());
         }
     }

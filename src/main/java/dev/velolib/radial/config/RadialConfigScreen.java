@@ -299,6 +299,12 @@ public class RadialConfigScreen {
                                 renderPreview(graphics, config);
                             }
                         }
+
+                        public boolean isFocused() {
+                            return false;
+                        }
+
+                        public void setFocused(boolean focused) {}
                     };
                 }
                 return widget;

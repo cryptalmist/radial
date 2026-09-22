@@ -307,8 +307,8 @@ public class DonutRenderer implements AutoCloseable {
 
                 // Early exit: Avoid heavy math on empty space (both inner hole and outer corners)
                 if (distCenter < innerR - aa - 1.0f || distCenter > outerR + aa + 1.0f) {
-                    baseImage.setPixel(x, y, 0x00000000);
-                    hotImage.setPixel(x, y, 0x00000000);
+                    baseImage.setPixelRGBA(x, y, 0x00000000);
+                    hotImage.setPixelRGBA(x, y, 0x00000000);
                     continue;
                 }
 
@@ -398,7 +398,7 @@ public class DonutRenderer implements AutoCloseable {
                 // Average sub-pixels and write to textures
                 baseAlphaTotal /= AA_SAMPLES;
                 if (baseAlphaTotal <= 0.0f) {
-                    baseImage.setPixel(x, y, 0x00000000);
+                    baseImage.setPixelRGBA(x, y, 0x00000000);
                 } else {
                     float denominator = baseAlphaTotal * AA_SAMPLES;
                     int alpha = Mth.clamp((int) (baseAlphaTotal * 255.0f + 0.5f), 0, 255);
@@ -407,12 +407,12 @@ public class DonutRenderer implements AutoCloseable {
                     int b = Mth.clamp((int) (baseBTotal / denominator + 0.5f), 0, 255);
 
                     int outColor = (alpha << 24) | (r << 16) | (g << 8) | b;
-                    baseImage.setPixelABGR(x, y, toABGR(outColor));
+                    baseImage.setPixelRGBA(x, y, toABGR(outColor));
                 }
 
                 hotAlphaTotal /= AA_SAMPLES;
                 if (hotAlphaTotal <= 0.0f) {
-                    hotImage.setPixel(x, y, 0x00000000);
+                    hotImage.setPixelRGBA(x, y, 0x00000000);
                 } else {
                     float denominator = hotAlphaTotal * AA_SAMPLES;
                     int alpha = Mth.clamp((int) (hotAlphaTotal * 255.0f + 0.5f), 0, 255);
@@ -421,7 +421,7 @@ public class DonutRenderer implements AutoCloseable {
                     int b = Mth.clamp((int) (hotBTotal / denominator + 0.5f), 0, 255);
 
                     int outColor = (alpha << 24) | (r << 16) | (g << 8) | b;
-                    hotImage.setPixelABGR(x, y, toABGR(outColor));
+                    hotImage.setPixelRGBA(x, y, toABGR(outColor));
                 }
             }
         }

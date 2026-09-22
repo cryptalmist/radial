@@ -1,15 +1,16 @@
 package dev.velolib.radial.ui.screen.iconpicker;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.function.Consumer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.components.AbstractSelectionList;
+import net.minecraft.client.gui.components.ContainerObjectSelectionList;
 import net.minecraft.client.gui.components.Renderable;
 import net.minecraft.client.gui.components.events.GuiEventListener;
+import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.network.chat.Component;
-import org.jspecify.annotations.NonNull;
 
 public abstract class GridIconTab<T> implements IconTab {
     protected final Consumer<String> onSelect;
@@ -72,7 +73,7 @@ public abstract class GridIconTab<T> implements IconTab {
             rows.add(new IconGridEntry(new ArrayList<>(currentResults.subList(start, end))));
         }
 
-        listWidget.replaceEntries(rows);
+        listWidget.setEntries(rows);
         listWidget.setScrollAmount(0.0);
     }
 
@@ -91,11 +92,18 @@ public abstract class GridIconTab<T> implements IconTab {
         return true;
     }
 
-    private class IconGridList extends AbstractSelectionList<IconGridEntry> {
+    private class IconGridList extends ContainerObjectSelectionList<IconGridEntry> {
 
         public IconGridList(Minecraft mc, int w, int h, int y, int rowHeight) {
             super(mc, w, h, y, rowHeight);
         }
+
+        public void setEntries(Collection<IconGridEntry> entries) {
+            replaceEntries(entries);
+        }
+
+        @Override
+        protected void updateWidgetNarration(NarrationElementOutput narrationElementOutput) {}
 
         @Override
         public int getRowWidth() {
@@ -108,7 +116,7 @@ public abstract class GridIconTab<T> implements IconTab {
         }
     }
 
-    private class IconGridEntry extends AbstractSelectionList.Entry<IconGridEntry> {
+    private class IconGridEntry extends ContainerObjectSelectionList.Entry<IconGridEntry> {
 
         private final List<T> items;
         private int lastLeft;
@@ -174,8 +182,7 @@ public abstract class GridIconTab<T> implements IconTab {
             return false;
         }
 
-        @Override
-        public @NonNull Component getNarration() {
+        public Component getNarration() {
             return items.isEmpty() ? Component.literal("Empty row") : getItemNarration(items.getFirst());
         }
     }

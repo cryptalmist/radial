@@ -34,7 +34,7 @@ public class KeybindSlotMode extends IconEnabledSlotMode {
 
         SPECIAL_ACTIONS.put(
                 new KeyMapping("key.debug.overlay", GLFW.GLFW_KEY_F3, "key.categories.debug"), client -> {
-                    client.options.renderDebug.set(!client.options.renderDebug.get());
+                    client.getDebugOverlay().showDebugScreen();
                 });
     }
 

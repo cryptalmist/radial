@@ -2,19 +2,20 @@ package dev.velolib.radial.ui.screen;
 
 import dev.velolib.radial.api.ShortcutEntry;
 import dev.velolib.radial.api.ShortcutRegistry;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.components.AbstractSelectionList;
 import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.components.ContainerObjectSelectionList;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
-import org.jspecify.annotations.NonNull;
 
 public class ShortcutSelectionScreen extends Screen {
 
@@ -103,7 +104,7 @@ public class ShortcutSelectionScreen extends Screen {
                 .map(entry -> new ShortcutEntryItem(entry, onSelect, this::onClose))
                 .collect(Collectors.toList());
 
-        shortcutList.replaceEntries(entries);
+        shortcutList.setEntries(entries);
         shortcutList.setScrollAmount(0.0);
     }
 
@@ -120,12 +121,19 @@ public class ShortcutSelectionScreen extends Screen {
         minecraft.setScreen(parent);
     }
 
-    private static class ShortcutList extends AbstractSelectionList<ShortcutEntryItem> {
+    private static class ShortcutList extends ContainerObjectSelectionList<ShortcutEntryItem> {
 
         private ShortcutList(Minecraft minecraft, int width, int height, int y, int itemHeight) {
 
             super(minecraft, width, height, y, itemHeight);
         }
+
+        public void setEntries(Collection<ShortcutEntryItem> entries) {
+            replaceEntries(entries);
+        }
+
+        @Override
+        protected void updateWidgetNarration(NarrationElementOutput narrationElementOutput) {}
 
         @Override
         public int getRowWidth() {
@@ -133,7 +141,7 @@ public class ShortcutSelectionScreen extends Screen {
         }
     }
 
-    private static class ShortcutEntryItem extends AbstractSelectionList.Entry<ShortcutEntryItem> {
+    private static class ShortcutEntryItem extends ContainerObjectSelectionList.Entry<ShortcutEntryItem> {
 
         private final ResourceLocation id;
         private final ShortcutEntry entry;
@@ -197,8 +205,7 @@ public class ShortcutSelectionScreen extends Screen {
             return true;
         }
 
-        @Override
-        public @NonNull Component getNarration() {
+        public Component getNarration() {
             return entry.name();
         }
     }

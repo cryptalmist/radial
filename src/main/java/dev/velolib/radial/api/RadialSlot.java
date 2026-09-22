@@ -4,7 +4,6 @@ import com.mojang.brigadier.StringReader;
 import java.util.ArrayList;
 import java.util.List;
 import net.minecraft.client.Minecraft;
-import net.minecraft.commands.arguments.item.ItemInput;
 import net.minecraft.commands.arguments.item.ItemParser;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.component.DataComponents;
@@ -51,7 +50,7 @@ public class RadialSlot {
 
             HolderLookup.Provider registryLookup = client.level.registryAccess();
 
-            ItemInput result = new ItemParser(registryLookup).parse(new StringReader(itemId));
+            ItemParser.ItemResult result = new ItemParser(registryLookup).parse(new StringReader(itemId));
 
             cachedStack = new ItemStack(result.item(), 1);
             cachedStack.applyComponentsAndValidate(result.components());

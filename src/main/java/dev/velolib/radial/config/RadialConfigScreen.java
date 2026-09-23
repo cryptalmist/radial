@@ -8,7 +8,6 @@ import dev.isxander.yacl3.gui.YACLScreen;
 import dev.velolib.radial.api.RadialSlot;
 import dev.velolib.radial.mode.SubmenuSlotMode;
 import dev.velolib.radial.render.DonutRenderer;
-
 import java.awt.*;
 import java.util.List;
 import net.minecraft.client.Minecraft;
@@ -54,7 +53,8 @@ public class RadialConfigScreen {
                                 .build())
                         .option(ButtonOption.createBuilder()
                                 .name(Component.translatable("screen.radial.config.optimize"))
-                                .description(OptionDescription.of(Component.translatable("screen.radial.config.optimize.tooltip")))
+                                .description(OptionDescription.of(
+                                        Component.translatable("screen.radial.config.optimize.tooltip")))
                                 .action((_, _) -> {
                                     optimizeSlotTree(config.slots);
                                     RadialConfig.save();

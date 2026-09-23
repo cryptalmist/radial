@@ -11,7 +11,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.Stack;
-
 import net.fabricmc.fabric.api.client.keymapping.v1.KeyMappingHelper;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
@@ -45,6 +44,7 @@ public class RadialScreen extends Screen {
     private static final DonutRenderer SECTOR_RENDERER = new DonutRenderer("main");
 
     private record MenuState(List<RadialSlot> slots, int slotCount) {}
+
     private final Stack<MenuState> history = new Stack<>();
 
     private final List<RadialSlot> rootSlots;

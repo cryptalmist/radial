@@ -17,7 +17,7 @@ public class OptionsMixin {
         Minecraft mc = Minecraft.getInstance();
 
         // Check if our screen is the one currently open
-        if (mc.gui.screen() instanceof RadialScreen radialScreen) {
+        if (mc.screen instanceof RadialScreen radialScreen) {
 
             // Get the user's actual saved setting (usually 0-10)
             Options options = (Options) (Object) this;

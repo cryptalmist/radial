@@ -69,7 +69,6 @@ public class ShortcutSlotMode extends IconEnabledSlotMode {
 
         Button valueBrowseButton = Button.builder(
                         Component.translatable("screen.radial.editor.select"), _ -> Minecraft.getInstance()
-                                .gui
                                 .setScreen(new ShortcutSelectionScreen(screen, (Identifier selectedId) -> {
                                     String idString = selectedId.toString();
                                     valueField.setValue(idString);

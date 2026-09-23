@@ -28,7 +28,10 @@ public class KeybindSlotMode extends IconEnabledSlotMode {
         // TODO: add crash debug key
 
         SPECIAL_ACTIONS.put(new KeyMapping("key.screenshot", GLFW.GLFW_KEY_F2, KeyMapping.Category.MISC), client -> {
-            Screenshot.grab(client, false);
+            Screenshot.grab(
+                    client.gameDirectory,
+                    client.getMainRenderTarget(),
+                    msg -> client.gui.getChat().addMessage(msg));
         });
 
         SPECIAL_ACTIONS.put(
@@ -73,7 +76,7 @@ public class KeybindSlotMode extends IconEnabledSlotMode {
 
         Button valueBrowseButton = Button.builder(
                         Component.translatable("screen.radial.editor.select"),
-                        _ -> Minecraft.getInstance().gui.setScreen(new KeybindPickerScreen(screen, id -> {
+                        _ -> Minecraft.getInstance().setScreen(new KeybindPickerScreen(screen, id -> {
                             valueField.setValue(id);
                             slot.value = id;
                         })))

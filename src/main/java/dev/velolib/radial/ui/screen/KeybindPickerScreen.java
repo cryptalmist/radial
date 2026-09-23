@@ -119,7 +119,7 @@ public class KeybindPickerScreen extends Screen {
 
     @Override
     public void onClose() {
-        minecraft.gui.setScreen(parent);
+        minecraft.setScreen(parent);
     }
 
     private static class KeybindList extends ObjectSelectionList<KeybindEntry> {

@@ -470,7 +470,7 @@ public class RadialScreen extends Screen {
 
                 RadialSlot slot = getTargetSlot(hoveredSlot);
                 if (slot != null) {
-                    minecraft.gui.setScreen(new SlotEditorScreen(slot));
+                    minecraft.setScreen(new SlotEditorScreen(slot));
                     return true;
                 }
             }

@@ -117,7 +117,7 @@ public class ShortcutSelectionScreen extends Screen {
 
     @Override
     public void onClose() {
-        minecraft.gui.setScreen(parent);
+        minecraft.setScreen(parent);
     }
 
     private static class ShortcutList extends ObjectSelectionList<ShortcutEntryItem> {

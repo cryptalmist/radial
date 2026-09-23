@@ -197,7 +197,7 @@ public class SlotEditorScreen extends Screen {
             slot.clearCache();
         }
 
-        minecraft.gui.setScreen(null);
+        minecraft.setScreen(null);
     }
 
     @Override

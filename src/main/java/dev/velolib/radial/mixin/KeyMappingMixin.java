@@ -17,7 +17,7 @@ public class KeyMappingMixin {
     private void allowRadialMovement(CallbackInfoReturnable<Boolean> cir) {
         Minecraft client = Minecraft.getInstance();
 
-        if (client.gui.screen() instanceof RadialScreen) {
+        if (client.screen instanceof RadialScreen) {
 
             KeyMapping self = (KeyMapping) (Object) this;
 

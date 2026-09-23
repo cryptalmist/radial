@@ -93,16 +93,16 @@ public class RadialClient implements ClientModInitializer {
 
         // REGISTER HUD & EVENTS
         HudElementRegistry.replaceElement(VanillaHudElements.CROSSHAIR, original -> (graphics, tracker) -> {
-            if (!(Minecraft.getInstance().gui.screen() instanceof RadialScreen)) {
+            if (!(Minecraft.getInstance().screen instanceof RadialScreen)) {
                 original.extractRenderState(graphics, tracker);
             }
         });
 
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
             if (OPEN_RADIAL.isDown()) {
-                if (!keyLocked && client.gui.screen() == null) {
+                if (!keyLocked && client.screen == null) {
                     RadialScreen.prepareRenderer();
-                    client.gui.setScreen(new RadialScreen());
+                    client.setScreen(new RadialScreen());
                 }
             } else {
                 keyLocked = false;

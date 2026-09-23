@@ -1,3 +1,4 @@
+# I used AI(OpenCode) to backport the [Radial](https://github.com/velolib/radial) mod
 <div align="center">
 
 <img alt="radial logo" height="128" src="https://github.com/velolib/radial/blob/main/src/main/resources/assets/radial/icon.png?raw=true"/>

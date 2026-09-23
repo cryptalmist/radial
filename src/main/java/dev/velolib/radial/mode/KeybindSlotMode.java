@@ -31,7 +31,7 @@ public class KeybindSlotMode extends IconEnabledSlotMode {
             Screenshot.grab(
                     client.gameDirectory,
                     client.getMainRenderTarget(),
-                    msg -> client.gui.getChat().addMessage(msg));
+                    msg -> RadialClient.LOGGER.info("Screenshot saved: {}", msg.getString()));
         });
 
         SPECIAL_ACTIONS.put(

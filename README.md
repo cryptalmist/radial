@@ -36,7 +36,20 @@ Bind your slots to whatever you need. Set up chat commands, standard keybinds, s
 ![Icon customization](./assets/propho4.webp)
 Represent your actions your way. Choose from any item (full NBT support included), sync visually with live inventory slots, display mob effect icons, Phosphor icons, or type out custom character combinations.
 
-## Version Support & Backports
+## Community Backports (this fork)
+
+> This is **cryptalmist/radial-backported** – a community backport hub. Upstream `velolib/radial` is forward-only. `main` here is left untouched to mirror upstream.
+
+- **Branches:** one per backport, e.g. `fabric-1.21.11`. Check `Branches` / `Releases` for builds. GitHub Actions builds each branch (no local build needed).
+- **Request a backport:** open an `Issues` → `New issue` with Minecraft version + loader (Fabric/NeoForge) + why. Anyone can pick it up.
+- **Make one yourself:**
+  1. Fork this repo, create `fabric-<mc-version>` (or `neoforge-<mc-version>`) from upstream `main` or `dev` for newest features.
+  2. Port it (downgrade `gradle.properties`, Loom/Yarn, Java, `fabric.mod.json`, Yarn mappings, HUD/mixin APIs).
+  3. Open a Pull Request into this repo's matching branch (or `main` if new). CI must pass (`spotlessJavaCheck` + `build`).
+  4. Once reviewed, it merges here and Actions uploads the jar as an artifact.
+- Current backport: `fabric-1.21.11` (Fabric, Yarn, Java 21, includes nested submenus, blur, cursor-reset, optimize from upstream `dev`).
+
+## Version Support & Backports (upstream policy)
 
 To keep development focused and maintain a healthy workflow, this mod operates on a **forward-only** development cycle.
 
